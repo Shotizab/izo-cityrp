@@ -498,9 +498,37 @@
   </div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
 <script>
+function loadScriptSeq(urls, cb, failCb){
+  let i=0;
+  function next(){
+    if(i>=urls.length){ failCb && failCb(); return; }
+    const s=document.createElement('script');
+    s.src=urls[i];
+    s.onload=cb;
+    s.onerror=function(){ i++; next(); };
+    document.head.appendChild(s);
+  }
+  next();
+}
+const FIREBASE_APP_URLS=[
+  'https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js',
+  'https://cdn.jsdelivr.net/npm/firebase@10.13.1/firebase-app-compat.js',
+  'https://unpkg.com/firebase@10.13.1/firebase-app-compat.js'
+];
+const FIREBASE_FIRESTORE_URLS=[
+  'https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js',
+  'https://cdn.jsdelivr.net/npm/firebase@10.13.1/firebase-firestore-compat.js',
+  'https://unpkg.com/firebase@10.13.1/firebase-firestore-compat.js'
+];
+function showFirebaseError(){
+  document.body.insertAdjacentHTML('afterbegin','<div style="background:#3a0d1a;color:#ff8fb3;padding:14px;text-align:center;font-family:sans-serif;font-size:14px;position:relative;z-index:999;">اتصال به دیتابیس سایت برقرار نشد. لطفاً اینترنتت رو چک کن یا دوباره صفحه رو رفرش کن.</div>');
+}
+loadScriptSeq(FIREBASE_APP_URLS, function(){
+  loadScriptSeq(FIREBASE_FIRESTORE_URLS, startApp, showFirebaseError);
+}, showFirebaseError);
+
+function startApp(){
 const ADMIN_PASSWORD = "izo1404";
 
 const firebaseConfig = {
@@ -798,6 +826,7 @@ document.getElementById('checkStatusBtn').addEventListener('click',()=>{
 });
 
 loadData();
+}
 </script>
 </body>
 </html>

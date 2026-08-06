@@ -222,13 +222,6 @@
   }
   .toast.show{display:block;}
 
-  .members-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;}
-  .member-chip{
-    background:var(--bg-panel);border:1px solid var(--border);border-radius:999px;
-    padding:10px 20px;font-size:14.5px;display:flex;align-items:center;gap:8px;
-  }
-  .member-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0;}
-
   footer{
     border-top:1px solid var(--border);padding:36px 24px;
     max-width:1100px;margin:0 auto;
@@ -433,16 +426,6 @@
   </div>
 </section>
 
-<section id="members">
-  <div class="section-head">
-    <div class="kicker">اعضای شهر</div>
-    <h2>لیست پذیرفته‌شده‌ها</h2>
-    <p>اسم کاراکترهایی که تا الان توی ایزو سیتی پذیرفته شدن.</p>
-  </div>
-  <button class="btn btn-ghost" id="showMembersBtn" style="width:100%;justify-content:center;">مشاهده لیست اعضا</button>
-  <div id="membersList" style="display:none;"></div>
-</section>
-
 <footer>
   <div>
     <div class="logo" style="font-size:16px;"><span class="dot"></span> IZO CITY</div>
@@ -627,21 +610,6 @@ function render(){
   renderStats();
   renderAdminNews();
   renderAdminRegs();
-  renderMembersList();
-}
-
-function renderMembersList(){
-  const box=document.getElementById('membersList');
-  if(!box) return;
-  const accepted=siteData.registrations.filter(r=>r.status==='accepted');
-  if(!accepted.length){
-    box.innerHTML='<div class="empty-state">هنوز هیچ عضوی پذیرفته نشده.</div>';
-    return;
-  }
-  const sorted=[...accepted].sort((a,b)=>b.ts-a.ts);
-  box.innerHTML='<div class="members-grid">'+sorted.map(r=>`
-    <div class="member-chip"><span class="dot"></span>${escapeHtml(r.character)}</div>
-  `).join('')+'</div>';
 }
 
 function renderNews(){
@@ -824,14 +792,6 @@ document.querySelectorAll('.admin-tab').forEach(tab=>{
   });
 });
 
-document.getElementById('showMembersBtn').addEventListener('click',()=>{
-  const box=document.getElementById('membersList');
-  const btn=document.getElementById('showMembersBtn');
-  const isHidden=box.style.display==='none';
-  box.style.display=isHidden?'block':'none';
-  btn.textContent=isHidden?'پنهان کردن لیست':'مشاهده لیست اعضا';
-});
-
 document.getElementById('checkStatusBtn').addEventListener('click',()=>{
   const val=document.getElementById('statusUsername').value.trim().toLowerCase();
   const resultBox=document.getElementById('statusResult');
@@ -870,5 +830,3 @@ loadData();
 </script>
 </body>
 </html>
-
-  

@@ -222,6 +222,25 @@
   }
   .toast.show{display:block;}
 
+  .members-grid{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;}
+  .member-chip{
+    background:var(--bg-panel);border:1px solid var(--border);border-radius:999px;
+    padding:10px 20px;font-size:14.5px;display:flex;align-items:center;gap:8px;
+  }
+  .member-chip .dot{width:6px;height:6px;border-radius:50%;background:var(--cyan);flex-shrink:0;}
+
+  .my-ticket-card{
+    background:var(--bg-panel);border:1px solid var(--border);border-radius:var(--radius);
+    padding:16px 18px;margin-bottom:12px;
+  }
+  .my-ticket-card .subject{font-weight:700;font-size:14.5px;margin-bottom:4px;}
+  .my-ticket-card .msg{font-size:13.5px;color:var(--text-dim);margin-bottom:8px;}
+  .my-ticket-card .reply{font-size:13.5px;color:var(--cyan);background:rgba(35,229,219,.08);border-radius:8px;padding:10px 12px;margin-top:8px;}
+  .ticket-reply-box textarea{
+    width:100%;background:var(--bg);border:1px solid var(--border);border-radius:10px;
+    padding:10px 12px;color:var(--text);font-size:13.5px;margin-top:8px;min-height:70px;
+  }
+
   footer{
     border-top:1px solid var(--border);padding:36px 24px;
     max-width:1100px;margin:0 auto;
@@ -290,7 +309,12 @@
       <a href="#news">اخبار</a>
       <a href="#rules">قوانین</a>
       <a href="#register">ثبت‌نام</a>
-      <a href="#status">وضعیت</a>
+      <a href="#ads">عضوگیری</a>
+      <a href="#support">حمایت</a>
+      <a href="#tickets">پشتیبانی</a>
+    </div>
+    <div id="accountArea" style="display:flex;align-items:center;gap:10px;">
+      <button class="btn btn-ghost" id="openLogin" style="padding:9px 18px;font-size:13.5px;">ورود</button>
     </div>
     <a href="#register" class="btn btn-primary" style="padding:9px 18px;font-size:13.5px;">ورود به شهر</a>
   </nav>
@@ -323,7 +347,7 @@
     </g>
   </svg>
   <div class="hero-inner">
-    <div class="eyebrow"><span class="live-dot"></span> سرور آنلاین است · پلتفرم VMP</div>
+    <div class="eyebrow"><span class="live-dot" id="statusDot"></span> <span id="statusText">سرور آنلاین است</span> · پلتفرم VMP</div>
     <h1 class="billboard">IZO <span>CITY</span></h1>
     <p class="tagline">یک شهر شبانه پر از فرصت، خطر و داستان‌های واقعی. رول‌پلی جدی، جامعه‌ی فعال، اقتصاد پویا — روی لانچر VMP.</p>
     <div class="hero-ctas">
@@ -401,6 +425,10 @@
         </div>
       </div>
       <div class="field">
+        <label for="regPassword">رمز عبور (برای ورود بعدی به حسابت)</label>
+        <input id="regPassword" type="password" placeholder="یه رمز انتخاب کن" required>
+      </div>
+      <div class="field">
         <label for="regNote">داستان کوتاه کاراکتر / توضیحات</label>
         <textarea id="regNote" placeholder="کمی درباره کاراکتر و انگیزه‌ت برای پیوستن بگو..."></textarea>
       </div>
@@ -426,6 +454,94 @@
   </div>
 </section>
 
+<section id="members">
+  <div class="section-head">
+    <div class="kicker">اعضای شهر</div>
+    <h2>لیست پذیرفته‌شده‌ها</h2>
+    <p>اسم کاراکترهایی که تا الان توی ایزو سیتی پذیرفته شدن.</p>
+  </div>
+  <button class="btn btn-ghost" id="showMembersBtn" style="width:100%;justify-content:center;">مشاهده لیست اعضا</button>
+  <div id="membersList" style="display:none;"></div>
+</section>
+
+<section id="ads">
+  <div class="section-head">
+    <div class="kicker">عضوگیری</div>
+    <h2>آگهی‌های عضوگیری</h2>
+    <p>فقط بازیکن‌هایی که ثبت‌نامشون قبول شده می‌تونن اینجا آگهی بذارن.</p>
+  </div>
+  <div class="news-grid" id="adsGrid">
+    <div class="empty-state">فعلاً آگهی‌ای ثبت نشده.</div>
+  </div>
+  <div class="register-box" style="margin-top:24px;">
+    <h3 style="margin-top:0;font-size:16px;">ثبت آگهی جدید</h3>
+    <div class="form-row">
+      <div class="field">
+        <label for="adUsername">نام کاربری دیسکورد (همون که باهاش ثبت‌نام کردی)</label>
+        <input id="adUsername" type="text" placeholder="مثلاً reza_gtx">
+      </div>
+      <div class="field">
+        <label for="adTitle">عنوان آگهی</label>
+        <input id="adTitle" type="text" placeholder="مثلاً دنبال هم‌تیمی برای گروه پلیس">
+      </div>
+    </div>
+    <div class="field">
+      <label for="adBody">توضیحات</label>
+      <textarea id="adBody" placeholder="توضیح بده دنبال چی هستی..."></textarea>
+    </div>
+    <button class="btn btn-primary" id="submitAdBtn" style="width:100%;justify-content:center;">ثبت آگهی</button>
+    <div class="toast" id="adToast"></div>
+  </div>
+</section>
+
+<section id="support">
+  <div class="section-head">
+    <div class="kicker">حمایت</div>
+    <h2>حمایت از سرور</h2>
+    <p>اگه دوست داری از ایزو سیتی حمایت کنی، از لینک زیر استفاده کن.</p>
+  </div>
+  <div class="register-box" style="text-align:center;">
+    <a href="#" id="supportLinkBtn" target="_blank" rel="noopener" class="btn btn-primary" style="justify-content:center;">حمایت از سرور</a>
+    <p id="supportEmptyMsg" style="display:none;color:var(--text-dim);font-size:13.5px;margin:16px 0 0;">فعلاً لینک حمایت تنظیم نشده.</p>
+  </div>
+</section>
+
+<section id="tickets">
+  <div class="section-head">
+    <div class="kicker">پشتیبانی</div>
+    <h2>ارسال تیکت پشتیبانی</h2>
+    <p>مشکلت رو بنویس، تیم مدیریت جواب می‌ده. با همون نام کاربری می‌تونی جواب رو ببینی.</p>
+  </div>
+  <div class="register-box">
+    <div class="form-row">
+      <div class="field">
+        <label for="ticketUsername">نام کاربری دیسکورد</label>
+        <input id="ticketUsername" type="text" placeholder="مثلاً reza_gtx">
+      </div>
+      <div class="field">
+        <label for="ticketSubject">موضوع</label>
+        <input id="ticketSubject" type="text" placeholder="موضوع تیکت">
+      </div>
+    </div>
+    <div class="field">
+      <label for="ticketMessage">پیام</label>
+      <textarea id="ticketMessage" placeholder="مشکلت رو کامل توضیح بده..."></textarea>
+    </div>
+    <button class="btn btn-primary" id="submitTicketBtn" style="width:100%;justify-content:center;">ارسال تیکت</button>
+    <div class="toast" id="ticketToast"></div>
+  </div>
+
+  <div class="register-box" style="margin-top:24px;">
+    <h3 style="margin-top:0;font-size:16px;">مشاهده تیکت‌های من</h3>
+    <div class="field" style="margin-bottom:14px;">
+      <label for="myTicketsUsername">نام کاربری دیسکورد</label>
+      <input id="myTicketsUsername" type="text" placeholder="مثلاً reza_gtx">
+    </div>
+    <button class="btn btn-ghost" id="checkTicketsBtn" style="width:100%;justify-content:center;">نمایش تیکت‌های من</button>
+    <div id="myTicketsList" style="margin-top:16px;"></div>
+  </div>
+</section>
+
 <footer>
   <div>
     <div class="logo" style="font-size:16px;"><span class="dot"></span> IZO CITY</div>
@@ -442,6 +558,27 @@
       <div class="news-detail-date" id="detailDate"></div>
       <h2 style="margin-top:0;" id="detailTitle"></h2>
       <div class="news-detail-body" id="detailBody"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="loginOverlay">
+  <div class="overlay-inner">
+    <button class="overlay-close" id="closeLogin">✕ بستن</button>
+    <div style="clear:both;"></div>
+    <div class="admin-card">
+      <h2 style="margin-top:0;">ورود به حساب</h2>
+      <p style="color:var(--text-dim);font-size:14px;">با همون نام کاربری و رمزی که موقع ثبت‌نام انتخاب کردی وارد شو.</p>
+      <div class="field">
+        <label for="loginUsername">نام کاربری دیسکورد</label>
+        <input id="loginUsername" type="text" placeholder="مثلاً reza_gtx">
+      </div>
+      <div class="field">
+        <label for="loginPassword">رمز عبور</label>
+        <input id="loginPassword" type="password" placeholder="رمز عبورت">
+      </div>
+      <button class="btn btn-primary" id="loginBtn" style="width:100%;justify-content:center;">ورود</button>
+      <div class="toast" id="loginError" style="background:rgba(255,46,126,.1);border-color:rgba(255,46,126,.35);color:var(--pink);">نام کاربری یا رمز عبور اشتباهه.</div>
     </div>
   </div>
 </div>
@@ -464,9 +601,20 @@
     </div>
 
     <div id="adminPanelView" style="display:none;">
+      <div class="admin-card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <h3 style="margin:0 0 4px;">وضعیت سرور</h3>
+          <p style="margin:0;color:var(--text-dim);font-size:13px;">وضعیتی که بالای سایت به بازیکن‌ها نشون داده می‌شه.</p>
+        </div>
+        <button class="btn btn-primary" id="toggleServerBtn" style="white-space:nowrap;">سرور روشن است</button>
+      </div>
+
       <div class="admin-tabs">
         <button class="admin-tab active" data-tab="newsTab">مدیریت اخبار</button>
         <button class="admin-tab" data-tab="regTab">ثبت‌نامی‌ها</button>
+        <button class="admin-tab" data-tab="adsTab">آگهی‌ها</button>
+        <button class="admin-tab" data-tab="supportTab">حمایت</button>
+        <button class="admin-tab" data-tab="ticketsTab">تیکت‌ها</button>
       </div>
 
       <div class="admin-panel-view active" id="newsTab">
@@ -492,6 +640,31 @@
         <div class="admin-card">
           <h3 style="margin-top:0;">لیست ثبت‌نامی‌ها</h3>
           <div id="adminRegList"><p style="color:var(--text-dim);font-size:14px;">هنوز کسی ثبت‌نام نکرده.</p></div>
+        </div>
+      </div>
+
+      <div class="admin-panel-view" id="adsTab">
+        <div class="admin-card">
+          <h3 style="margin-top:0;">آگهی‌های عضوگیری</h3>
+          <div id="adminAdsList"><p style="color:var(--text-dim);font-size:14px;">آگهی‌ای ثبت نشده.</p></div>
+        </div>
+      </div>
+
+      <div class="admin-panel-view" id="supportTab">
+        <div class="admin-card">
+          <h3 style="margin-top:0;">لینک حمایت از سرور</h3>
+          <div class="field">
+            <label for="supportLinkInput">آدرس لینک حمایت (مثلاً درگاه پرداخت یا کانال دونیت)</label>
+            <input id="supportLinkInput" type="text" placeholder="https://...">
+          </div>
+          <button class="btn btn-primary" id="saveSupportLinkBtn">ذخیره لینک</button>
+        </div>
+      </div>
+
+      <div class="admin-panel-view" id="ticketsTab">
+        <div class="admin-card">
+          <h3 style="margin-top:0;">تیکت‌های پشتیبانی</h3>
+          <div id="adminTicketsList"><p style="color:var(--text-dim);font-size:14px;">تیکتی ثبت نشده.</p></div>
         </div>
       </div>
     </div>
@@ -566,7 +739,43 @@ function escapeHtml(str){
   const d=document.createElement('div');d.innerText=str;return d.innerHTML;
 }
 
-let siteData={news:[],registrations:[]};
+let siteData={news:[],registrations:[],serverStatus:'online',ads:[],supportLink:'',tickets:[]};
+let currentUser=null;
+
+function restoreSession(){
+  const savedUsername=localStorage.getItem('izoCityUsername');
+  if(!savedUsername) return;
+  const match=siteData.registrations.find(r=>r.username.trim().toLowerCase()===savedUsername.trim().toLowerCase());
+  currentUser=match||null;
+  if(!currentUser) localStorage.removeItem('izoCityUsername');
+}
+
+function updateAccountUI(){
+  const area=document.getElementById('accountArea');
+  if(!area) return;
+  if(currentUser){
+    area.innerHTML=`<span style="font-size:13.5px;color:var(--text-dim);">خوش اومدی <span style="color:var(--cyan);">${escapeHtml(currentUser.character)}</span></span><button class="btn btn-ghost" id="logoutBtn" style="padding:9px 16px;font-size:13px;">خروج</button>`;
+    document.getElementById('logoutBtn').addEventListener('click',()=>{
+      currentUser=null;
+      localStorage.removeItem('izoCityUsername');
+      updateAccountUI();
+      autofillUsernameFields();
+    });
+  }else{
+    area.innerHTML=`<button class="btn btn-ghost" id="openLogin" style="padding:9px 18px;font-size:13.5px;">ورود</button>`;
+    document.getElementById('openLogin').addEventListener('click',()=>{
+      document.getElementById('loginOverlay').classList.add('show');
+    });
+  }
+}
+
+function autofillUsernameFields(){
+  const val=currentUser?currentUser.username:'';
+  ['statusUsername','adUsername','ticketUsername','myTicketsUsername'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value=val;
+  });
+}
 
 async function loadData(){
   try{
@@ -575,13 +784,19 @@ async function loadData(){
       const data=docSnap.data();
       siteData.news=data.news||[];
       siteData.registrations=data.registrations||[];
+      siteData.serverStatus=data.serverStatus||'online';
+      siteData.ads=data.ads||[];
+      siteData.supportLink=data.supportLink||'';
+      siteData.tickets=data.tickets||[];
     }else{
-      await siteDocRef.set({news:[],registrations:[]});
+      await siteDocRef.set({news:[],registrations:[],serverStatus:'online',ads:[],supportLink:'',tickets:[]});
     }
   }catch(e){
     console.error('firestore load failed',e);
   }
+  restoreSession();
   render();
+  autofillUsernameFields();
   const hash=window.location.hash;
   if(hash.startsWith('#news-')){
     openNewsDetail(hash.replace('#news-',''));
@@ -590,7 +805,14 @@ async function loadData(){
 
 async function saveData(){
   try{
-    await siteDocRef.set({news:siteData.news,registrations:siteData.registrations});
+    await siteDocRef.set({
+      news:siteData.news,
+      registrations:siteData.registrations,
+      serverStatus:siteData.serverStatus,
+      ads:siteData.ads,
+      supportLink:siteData.supportLink,
+      tickets:siteData.tickets
+    });
   }catch(e){
     console.error('firestore save failed',e);
   }
@@ -601,6 +823,10 @@ siteDocRef.onSnapshot((docSnap)=>{
   const data=docSnap.data();
   siteData.news=data.news||[];
   siteData.registrations=data.registrations||[];
+  siteData.serverStatus=data.serverStatus||'online';
+  siteData.ads=data.ads||[];
+  siteData.supportLink=data.supportLink||'';
+  siteData.tickets=data.tickets||[];
   render();
 });
 
@@ -610,6 +836,151 @@ function render(){
   renderStats();
   renderAdminNews();
   renderAdminRegs();
+  renderMembersList();
+  renderServerStatus();
+  renderAds();
+  renderAdminAds();
+  renderSupportSection();
+  renderAdminSupport();
+  renderAdminTickets();
+  updateAccountUI();
+}
+
+function renderServerStatus(){
+  const dot=document.getElementById('statusDot');
+  const text=document.getElementById('statusText');
+  const btn=document.getElementById('toggleServerBtn');
+  const isOnline=siteData.serverStatus!=='offline';
+  if(text) text.textContent=isOnline?'سرور آنلاین است':'سرور خاموش است';
+  if(dot) dot.style.background=isOnline?'var(--gold)':'var(--pink)';
+  if(btn) btn.textContent=isOnline?'خاموش کردن سرور':'روشن کردن سرور';
+}
+
+function renderAds(){
+  const grid=document.getElementById('adsGrid');
+  if(!grid) return;
+  if(!siteData.ads.length){
+    grid.innerHTML='<div class="empty-state">فعلاً آگهی‌ای ثبت نشده.</div>';
+    return;
+  }
+  const sorted=[...siteData.ads].sort((a,b)=>b.ts-a.ts);
+  grid.innerHTML=sorted.map(a=>`
+    <div class="news-card" style="cursor:default;">
+      <div>
+        <div class="news-date">${escapeHtml(a.character||a.username)}</div>
+        <h3>${escapeHtml(a.title)}</h3>
+        <p style="color:var(--text-dim);font-size:14px;margin:8px 0 0;">${escapeHtml(a.body)}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderAdminAds(){
+  const box=document.getElementById('adminAdsList');
+  if(!box) return;
+  if(!siteData.ads.length){
+    box.innerHTML='<p style="color:var(--text-dim);font-size:14px;">آگهی‌ای ثبت نشده.</p>';
+    return;
+  }
+  const sorted=[...siteData.ads].sort((a,b)=>b.ts-a.ts);
+  box.innerHTML=sorted.map(a=>`
+    <div class="reg-row">
+      <div>
+        <div class="name">${escapeHtml(a.title)} <span style="color:var(--text-dim);font-weight:400;">(${escapeHtml(a.username)})</span></div>
+        <div style="font-size:13px;color:var(--text-dim);margin-top:6px;max-width:420px;">${escapeHtml(a.body)}</div>
+      </div>
+      <button class="del-btn" data-del-ad="${a.id}">حذف</button>
+    </div>
+  `).join('');
+  box.querySelectorAll('[data-del-ad]').forEach(btn=>{
+    btn.addEventListener('click',async()=>{
+      siteData.ads=siteData.ads.filter(x=>x.id!==btn.dataset.delAd);
+      await saveData();
+      render();
+    });
+  });
+}
+
+function renderSupportSection(){
+  const linkBtn=document.getElementById('supportLinkBtn');
+  const emptyMsg=document.getElementById('supportEmptyMsg');
+  if(!linkBtn) return;
+  if(siteData.supportLink){
+    linkBtn.href=siteData.supportLink;
+    linkBtn.style.display='inline-flex';
+    emptyMsg.style.display='none';
+  }else{
+    linkBtn.style.display='none';
+    emptyMsg.style.display='block';
+  }
+}
+
+function renderAdminSupport(){
+  const input=document.getElementById('supportLinkInput');
+  if(!input) return;
+  if(document.activeElement!==input){
+    input.value=siteData.supportLink||'';
+  }
+}
+
+function renderAdminTickets(){
+  const box=document.getElementById('adminTicketsList');
+  if(!box) return;
+  if(!siteData.tickets.length){
+    box.innerHTML='<p style="color:var(--text-dim);font-size:14px;">تیکتی ثبت نشده.</p>';
+    return;
+  }
+  const sorted=[...siteData.tickets].sort((a,b)=>b.ts-a.ts);
+  box.innerHTML=sorted.map(t=>`
+    <div class="reg-row" style="flex-direction:column;align-items:stretch;">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+        <div>
+          <div class="name">${escapeHtml(t.subject)} <span style="color:var(--text-dim);font-weight:400;">(${escapeHtml(t.username)})</span></div>
+          <div style="font-size:13px;color:var(--text-dim);margin-top:6px;max-width:420px;">${escapeHtml(t.message)}</div>
+          <div><span class="status-badge ${t.status==='answered'?'status-accepted':'status-pending'}">${t.status==='answered'?'پاسخ داده شده':'در انتظار پاسخ'}</span></div>
+        </div>
+        <button class="del-btn" data-del-ticket="${t.id}">حذف</button>
+      </div>
+      <div class="ticket-reply-box">
+        <textarea data-reply-input="${t.id}" placeholder="پاسخت رو اینجا بنویس...">${escapeHtml(t.reply||'')}</textarea>
+        <button class="btn btn-primary" style="margin-top:8px;" data-send-reply="${t.id}">ارسال پاسخ</button>
+      </div>
+    </div>
+  `).join('');
+  box.querySelectorAll('[data-del-ticket]').forEach(btn=>{
+    btn.addEventListener('click',async()=>{
+      siteData.tickets=siteData.tickets.filter(x=>x.id!==btn.dataset.delTicket);
+      await saveData();
+      render();
+    });
+  });
+  box.querySelectorAll('[data-send-reply]').forEach(btn=>{
+    btn.addEventListener('click',async()=>{
+      const id=btn.dataset.sendReply;
+      const textarea=box.querySelector(`[data-reply-input="${id}"]`);
+      const ticket=siteData.tickets.find(x=>x.id===id);
+      if(ticket){
+        ticket.reply=textarea.value.trim();
+        ticket.status='answered';
+      }
+      await saveData();
+      render();
+    });
+  });
+}
+
+function renderMembersList(){
+  const box=document.getElementById('membersList');
+  if(!box) return;
+  const accepted=siteData.registrations.filter(r=>r.status==='accepted');
+  if(!accepted.length){
+    box.innerHTML='<div class="empty-state">هنوز هیچ عضوی پذیرفته نشده.</div>';
+    return;
+  }
+  const sorted=[...accepted].sort((a,b)=>b.ts-a.ts);
+  box.innerHTML='<div class="members-grid">'+sorted.map(r=>`
+    <div class="member-chip"><span class="dot"></span>${escapeHtml(r.character)}</div>
+  `).join('')+'</div>';
 }
 
 function renderNews(){
@@ -740,9 +1111,10 @@ document.getElementById('regForm').addEventListener('submit',async(e)=>{
   const character=document.getElementById('regCharacter').value.trim();
   const job=document.getElementById('regJob').value;
   const age=document.getElementById('regAge').value.trim();
+  const password=document.getElementById('regPassword').value;
   const note=document.getElementById('regNote').value.trim();
-  if(!username||!character) return;
-  siteData.registrations.push({id:uid(),username,character,job,age,note,status:'pending',ts:Date.now()});
+  if(!username||!character||!password) return;
+  siteData.registrations.push({id:uid(),username,character,job,age,password,note,status:'pending',ts:Date.now()});
   await saveData();
   e.target.reset();
   const toast=document.getElementById('regToast');
@@ -763,6 +1135,31 @@ document.getElementById('addNewsBtn').addEventListener('click',async()=>{
 });
 
 document.getElementById('closeNewsDetail').addEventListener('click',closeNewsDetail);
+
+document.getElementById('closeLogin').addEventListener('click',()=>{
+  document.getElementById('loginOverlay').classList.remove('show');
+});
+document.getElementById('loginBtn').addEventListener('click',()=>{
+  const username=document.getElementById('loginUsername').value.trim();
+  const password=document.getElementById('loginPassword').value;
+  const errorBox=document.getElementById('loginError');
+  const match=siteData.registrations.find(r=>r.username.trim().toLowerCase()===username.toLowerCase() && r.password===password);
+  if(!username||!password||!match){
+    errorBox.classList.add('show');
+    return;
+  }
+  errorBox.classList.remove('show');
+  currentUser=match;
+  localStorage.setItem('izoCityUsername',match.username);
+  document.getElementById('loginUsername').value='';
+  document.getElementById('loginPassword').value='';
+  document.getElementById('loginOverlay').classList.remove('show');
+  updateAccountUI();
+  autofillUsernameFields();
+});
+document.getElementById('loginPassword').addEventListener('keydown',(e)=>{
+  if(e.key==='Enter') document.getElementById('loginBtn').click();
+});
 
 document.getElementById('openAdmin').addEventListener('click',()=>{
   document.getElementById('adminOverlay').classList.add('show');
@@ -790,6 +1187,97 @@ document.querySelectorAll('.admin-tab').forEach(tab=>{
     tab.classList.add('active');
     document.getElementById(tab.dataset.tab).classList.add('active');
   });
+});
+
+document.getElementById('showMembersBtn').addEventListener('click',()=>{
+  const box=document.getElementById('membersList');
+  const btn=document.getElementById('showMembersBtn');
+  const isHidden=box.style.display==='none';
+  box.style.display=isHidden?'block':'none';
+  btn.textContent=isHidden?'پنهان کردن لیست':'مشاهده لیست اعضا';
+});
+
+document.getElementById('toggleServerBtn').addEventListener('click',async()=>{
+  siteData.serverStatus=siteData.serverStatus==='offline'?'online':'offline';
+  await saveData();
+  render();
+});
+
+document.getElementById('submitAdBtn').addEventListener('click',async()=>{
+  const username=document.getElementById('adUsername').value.trim();
+  const title=document.getElementById('adTitle').value.trim();
+  const body=document.getElementById('adBody').value.trim();
+  const toast=document.getElementById('adToast');
+  toast.classList.add('show');
+  if(!username||!title||!body){
+    toast.textContent='همه‌ی فیلدها رو پر کن.';
+    toast.style.background='rgba(255,46,126,.1)';toast.style.borderColor='rgba(255,46,126,.35)';toast.style.color='var(--pink)';
+    return;
+  }
+  const accepted=siteData.registrations.find(r=>r.username.trim().toLowerCase()===username.toLowerCase() && r.status==='accepted');
+  if(!accepted){
+    toast.textContent='فقط بازیکن‌هایی که ثبت‌نامشون قبول شده می‌تونن آگهی بذارن.';
+    toast.style.background='rgba(255,46,126,.1)';toast.style.borderColor='rgba(255,46,126,.35)';toast.style.color='var(--pink)';
+    return;
+  }
+  siteData.ads.push({id:uid(),username,character:accepted.character,title,body,ts:Date.now()});
+  await saveData();
+  document.getElementById('adUsername').value='';
+  document.getElementById('adTitle').value='';
+  document.getElementById('adBody').value='';
+  toast.textContent='آگهی با موفقیت ثبت شد.';
+  toast.style.background='rgba(35,229,219,.1)';toast.style.borderColor='rgba(35,229,219,.35)';toast.style.color='var(--cyan)';
+  render();
+});
+
+document.getElementById('saveSupportLinkBtn').addEventListener('click',async()=>{
+  siteData.supportLink=document.getElementById('supportLinkInput').value.trim();
+  await saveData();
+  render();
+});
+
+document.getElementById('submitTicketBtn').addEventListener('click',async()=>{
+  const username=document.getElementById('ticketUsername').value.trim();
+  const subject=document.getElementById('ticketSubject').value.trim();
+  const message=document.getElementById('ticketMessage').value.trim();
+  const toast=document.getElementById('ticketToast');
+  toast.classList.add('show');
+  if(!username||!subject||!message){
+    toast.textContent='همه‌ی فیلدها رو پر کن.';
+    toast.style.background='rgba(255,46,126,.1)';toast.style.borderColor='rgba(255,46,126,.35)';toast.style.color='var(--pink)';
+    return;
+  }
+  siteData.tickets.push({id:uid(),username,subject,message,reply:'',status:'open',ts:Date.now()});
+  await saveData();
+  document.getElementById('ticketUsername').value='';
+  document.getElementById('ticketSubject').value='';
+  document.getElementById('ticketMessage').value='';
+  toast.textContent='تیکت ثبت شد. منتظر پاسخ تیم مدیریت باش.';
+  toast.style.background='rgba(35,229,219,.1)';toast.style.borderColor='rgba(35,229,219,.35)';toast.style.color='var(--cyan)';
+  render();
+});
+
+document.getElementById('checkTicketsBtn').addEventListener('click',()=>{
+  const val=document.getElementById('myTicketsUsername').value.trim().toLowerCase();
+  const box=document.getElementById('myTicketsList');
+  if(!val){
+    box.innerHTML='<div class="empty-state">نام کاربری رو وارد کن.</div>';
+    return;
+  }
+  const mine=siteData.tickets.filter(t=>t.username.trim().toLowerCase()===val);
+  if(!mine.length){
+    box.innerHTML='<div class="empty-state">تیکتی با این نام کاربری پیدا نشد.</div>';
+    return;
+  }
+  const sorted=[...mine].sort((a,b)=>b.ts-a.ts);
+  box.innerHTML=sorted.map(t=>`
+    <div class="my-ticket-card">
+      <div class="subject">${escapeHtml(t.subject)}</div>
+      <div class="msg">${escapeHtml(t.message)}</div>
+      <div><span class="status-badge ${t.status==='answered'?'status-accepted':'status-pending'}">${t.status==='answered'?'پاسخ داده شده':'در انتظار پاسخ'}</span></div>
+      ${t.reply?`<div class="reply">${escapeHtml(t.reply)}</div>`:''}
+    </div>
+  `).join('');
 });
 
 document.getElementById('checkStatusBtn').addEventListener('click',()=>{

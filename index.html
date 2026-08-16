@@ -1,511 +1,469 @@
-import os, zipfile, textwrap, json
-
-root = "/mnt/data/alf_shop"
-assets = os.path.join(root, "assets")
-os.makedirs(assets, exist_ok=True)
-
-index_html = r'''<!doctype html>
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>الف شاپ | فروشگاه آنلاین پوشاک زنانه</title>
-  <meta name="description" content="الف شاپ؛ فروشگاه آنلاین ست و لباس زنانه">
-  <link rel="stylesheet" href="./style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>الف شاپ | فروشگاه آنلاین پوشاک زنانه</title>
+
+    <link rel="stylesheet" href="style.css">
+    <script src="app.js" defer></script>
 </head>
+
 <body>
-  <header class="site-header">
-    <div class="container nav">
-      <a class="brand" href="#home">🛍️ الف شاپ</a>
-      <nav>
-        <a href="#home">خانه</a>
-        <a href="#products">محصولات</a>
-        <a href="#cart">سبد خرید <span id="cartCount" class="badge">0</span></a>
-        <button id="adminBtn" class="nav-btn">🔐 مدیریت</button>
-      </nav>
-    </div>
-  </header>
 
-  <main>
-    <section id="home" class="hero container">
-      <img src="./assets/banner.jpg" alt="بنر الف شاپ" class="hero-img"
-           onerror="this.style.display='none'; document.getElementById('bannerFallback').style.display='grid'">
-      <div id="bannerFallback" class="banner-fallback" style="display:none">
-        <div>
-          <span>الف شاپ</span>
-          <h1>مد روز، قیمت مناسب</h1>
-          <p>هر چیزی که برای یک استایل راحت و شیک نیاز داری.</p>
-          <a href="#products" class="primary">مشاهده محصولات</a>
+    <!-- ================= HEADER ================= -->
+    <header class="site-header">
+
+        <div class="container header-inner">
+
+            <a href="#home" class="brand">
+                🛍️ الف شاپ
+            </a>
+
+            <nav class="nav">
+
+                <a href="#home">خانه</a>
+
+                <a href="#products">محصولات</a>
+
+                <a href="#categories">دسته‌بندی‌ها</a>
+
+                <a href="#cart">
+                    🛒 سبد خرید
+                    <span id="cartCount">0</span>
+                </a>
+
+                <button type="button" id="adminBtn" class="admin-button">
+                    ⚙️ مدیریت
+                </button>
+
+            </nav>
+
         </div>
-      </div>
-    </section>
 
-    <section class="categories container">
-      <h2>دسته‌بندی محصولات</h2>
-      <p>محصول مورد نظرت رو انتخاب کن.</p>
-      <div id="categoryBar" class="category-bar"></div>
-    </section>
+    </header>
 
-    <section id="products" class="products-section container">
-      <div class="section-head">
-        <div>
-          <h2>محصولات الف شاپ</h2>
-          <p id="productSummary">جدیدترین محصولات فروشگاه</p>
+
+    <!-- ================= MAIN ================= -->
+    <main>
+
+        <!-- HERO -->
+        <section id="home" class="hero container">
+
+            <img
+                src="assets/banner.jpg"
+                alt="الف شاپ - فروشگاه پوشاک زنانه"
+                class="hero-image"
+                onerror="this.style.display='none';"
+            >
+
+            <div class="hero-content">
+
+                <div class="hero-logo">
+                    🛍️ الف شاپ
+                </div>
+
+                <p>
+                    فروشگاه آنلاین ست و لباس زنانه
+                </p>
+
+                <h1>
+                    مد روز، قیمت مناسب
+                </h1>
+
+                <p class="hero-description">
+                    هر چیزی که واسه استایل راحت و شیک تو خونه و بیرون نیاز داری پیدا میشه
+                </p>
+
+                <a href="#products" class="primary-button">
+                    مشاهده محصولات
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= CATEGORIES ================= -->
+        <section id="categories" class="container section">
+
+            <div class="section-title">
+                <h2>دسته‌بندی محصولات</h2>
+                <p>محصول مورد نظرت رو انتخاب کن</p>
+            </div>
+
+            <div class="category-list">
+
+                <button
+                    type="button"
+                    class="category-button active"
+                    data-category="همه">
+                    ✨ همه محصولات
+                </button>
+
+                <button
+                    type="button"
+                    class="category-button"
+                    data-category="مانتو">
+                    👗 مانتو
+                </button>
+
+                <button
+                    type="button"
+                    class="category-button"
+                    data-category="شومیز">
+                    🎀 شومیز
+                </button>
+
+                <button
+                    type="button"
+                    class="category-button"
+                    data-category="لباس زنانه">
+                    👚 لباس زنانه
+                </button>
+
+                <button
+                    type="button"
+                    class="category-button"
+                    data-category="ست زنانه">
+                    💗 ست زنانه
+                </button>
+
+                <button
+                    type="button"
+                    class="category-button"
+                    data-category="اکسسوری">
+                    👜 اکسسوری
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PRODUCTS ================= -->
+        <section id="products" class="container section">
+
+            <div class="section-title">
+
+                <h2>
+                    محصولات الف شاپ
+                </h2>
+
+                <p>
+                    جدیدترین محصولات فروشگاه
+                </p>
+
+            </div>
+
+
+            <div class="products-tools">
+
+                <input
+                    type="search"
+                    id="search"
+                    placeholder="🔎 جستجوی محصول..."
+                >
+
+                <select id="categoryFilter">
+
+                    <option value="همه">
+                        همه دسته‌ها
+                    </option>
+
+                    <option value="مانتو">
+                        مانتو
+                    </option>
+
+                    <option value="شومیز">
+                        شومیز
+                    </option>
+
+                    <option value="لباس زنانه">
+                        لباس زنانه
+                    </option>
+
+                    <option value="ست زنانه">
+                        ست زنانه
+                    </option>
+
+                    <option value="اکسسوری">
+                        اکسسوری
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div id="productGrid" class="product-grid">
+                <!-- محصولات توسط app.js ساخته می‌شوند -->
+            </div>
+
+        </section>
+
+
+        <!-- ================= CART ================= -->
+        <section id="cart" class="container section">
+
+            <div class="cart-panel">
+
+                <div class="section-title">
+
+                    <h2>
+                        🛒 سبد خرید
+                    </h2>
+
+                    <p>
+                        محصولات انتخاب‌شده شما
+                    </p>
+
+                </div>
+
+                <div id="cartItems" class="cart-items">
+
+                    <div class="empty-cart">
+                        سبد خرید شما خالی است.
+                    </div>
+
+                </div>
+
+
+                <div class="cart-bottom">
+
+                    <strong>
+                        مجموع:
+                        <span id="cartTotal">
+                            0 تومان
+                        </span>
+                    </strong>
+
+                    <button
+                        type="button"
+                        id="checkoutBtn"
+                        class="primary-button">
+                        ثبت سفارش
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= ADMIN MODAL ================= -->
+    <div
+        id="adminModal"
+        class="modal"
+        aria-hidden="true">
+
+        <div class="modal-box">
+
+            <button
+                type="button"
+                id="closeAdmin"
+                class="modal-close">
+                ×
+            </button>
+
+
+            <!-- LOGIN -->
+            <div id="adminLogin">
+
+                <h2>
+                    🔐 ورود مدیریت الف شاپ
+                </h2>
+
+                <p>
+                    رمز مدیریت را وارد کنید
+                </p>
+
+                <input
+                    type="password"
+                    id="adminPassword"
+                    placeholder="رمز مدیریت"
+                >
+
+                <button
+                    type="button"
+                    id="adminLoginBtn"
+                    class="primary-button">
+                    ورود
+                </button>
+
+                <p
+                    id="loginError"
+                    class="error-message">
+                </p>
+
+            </div>
+
+
+            <!-- ADMIN PANEL -->
+            <div
+                id="adminPanel"
+                style="display:none;">
+
+                <h2>
+                    ⚙️ پنل مدیریت الف شاپ
+                </h2>
+
+
+                <!-- ADD PRODUCT -->
+                <div class="admin-section">
+
+                    <h3>
+                        ➕ افزودن محصول
+                    </h3>
+
+                    <form id="productForm">
+
+                        <input
+                            type="text"
+                            id="productName"
+                            placeholder="نام محصول"
+                            required
+                        >
+
+                        <input
+                            type="number"
+                            id="productPrice"
+                            placeholder="قیمت به تومان"
+                            min="0"
+                            required
+                        >
+
+                        <select
+                            id="productCategory"
+                            required>
+
+                            <option value="">
+                                انتخاب دسته‌بندی
+                            </option>
+
+                            <option value="مانتو">
+                                مانتو
+                            </option>
+
+                            <option value="شومیز">
+                                شومیز
+                            </option>
+
+                            <option value="لباس زنانه">
+                                لباس زنانه
+                            </option>
+
+                            <option value="ست زنانه">
+                                ست زنانه
+                            </option>
+
+                            <option value="اکسسوری">
+                                اکسسوری
+                            </option>
+
+                        </select>
+
+
+                        <input
+                            type="text"
+                            id="productImage"
+                            placeholder="مسیر عکس، مثال: assets/product1.jpg"
+                        >
+
+
+                        <textarea
+                            id="productDescription"
+                            placeholder="توضیحات محصول">
+                        </textarea>
+
+
+                        <button
+                            type="submit"
+                            class="primary-button">
+                            افزودن محصول
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <!-- DELETE PRODUCTS -->
+                <div class="admin-section">
+
+                    <h3>
+                        🗑️ مدیریت محصولات
+                    </h3>
+
+                    <div id="adminProductList">
+                        <!-- لیست محصولات اینجا قرار می‌گیرد -->
+                    </div>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="adminLogout"
+                    class="danger-button">
+                    خروج از پنل
+                </button>
+
+            </div>
+
         </div>
-        <input id="searchInput" type="search" placeholder="🔎 جستجوی محصول...">
-      </div>
-      <div id="productGrid" class="product-grid"></div>
-      <div id="emptyProducts" class="empty" hidden>محصولی پیدا نشد.</div>
-    </section>
 
-    <section id="cart" class="cart-section container">
-      <div class="section-head">
-        <div>
-          <h2>🛒 سبد خرید</h2>
-          <p>محصولات انتخاب‌شده شما</p>
+    </div>
+
+
+    <!-- ================= PRODUCT MODAL ================= -->
+    <div
+        id="productModal"
+        class="modal"
+        aria-hidden="true">
+
+        <div class="modal-box">
+
+            <button
+                type="button"
+                id="closeProduct"
+                class="modal-close">
+                ×
+            </button>
+
+            <div id="productDetails">
+                <!-- جزئیات محصول -->
+            </div>
+
         </div>
-        <button id="clearCartBtn" class="secondary">خالی کردن سبد</button>
-      </div>
-      <div id="cartList" class="cart-list"></div>
-      <div class="cart-total">
-        <span>مجموع</span>
-        <strong id="cartTotal">۰ تومان</strong>
-      </div>
-      <button id="orderBtn" class="primary wide">ثبت سفارش</button>
-    </section>
-  </main>
 
-  <footer>
-    <div class="container">
-      <strong>الف شاپ</strong>
-      <span>فروشگاه آنلاین ست و لباس زنانه</span>
     </div>
-  </footer>
 
-  <div id="modal" class="modal" hidden>
-    <div class="modal-card">
-      <button class="modal-close" data-close>×</button>
-      <div id="modalContent"></div>
-    </div>
-  </div>
 
-  <script src="./app.js"></script>
+    <!-- ================= FOOTER ================= -->
+    <footer class="site-footer">
+
+        <div class="container">
+
+            <strong>
+                🛍️ الف شاپ
+            </strong>
+
+            <p>
+                فروشگاه آنلاین ست و لباس زنانه
+            </p>
+
+            <p>
+                © تمامی حقوق برای الف شاپ محفوظ است.
+            </p>
+
+        </div>
+
+    </footer>
+
 </body>
 </html>
-'''
-
-style_css = r'''@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap');
-
-:root{
-  --pink:#e91e63;
-  --pink2:#ff4f91;
-  --soft:#fff0f6;
-  --dark:#27151e;
-  --text:#3a2630;
-  --muted:#806b75;
-  --white:#fff;
-  --line:#f2d8e2;
-  --shadow:0 12px 35px rgba(87,25,51,.12);
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  margin:0;
-  font-family:Vazirmatn,Tahoma,Arial,sans-serif;
-  color:var(--text);
-  background:#fff8fb;
-}
-button,input,select,textarea{font:inherit}
-button{cursor:pointer}
-a{text-decoration:none;color:inherit}
-.container{width:min(1180px,92%);margin:auto}
-
-.site-header{
-  position:sticky;top:0;z-index:50;
-  background:rgba(255,255,255,.94);
-  backdrop-filter:blur(14px);
-  border-bottom:1px solid var(--line);
-}
-.nav{
-  min-height:72px;display:flex;align-items:center;
-  justify-content:space-between;gap:20px;
-}
-.brand{font-size:25px;font-weight:800;color:var(--pink)}
-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-nav a,.nav-btn{
-  border:0;background:transparent;padding:10px 13px;border-radius:10px;
-  color:var(--text);font-weight:600
-}
-nav a:hover,.nav-btn:hover{background:var(--soft);color:var(--pink)}
-.badge{
-  display:inline-grid;place-items:center;min-width:21px;height:21px;
-  padding:0 5px;background:var(--pink);color:white;border-radius:99px;font-size:12px
-}
-.nav-btn{background:#fff0f6;color:var(--pink)}
-
-.hero{padding:22px 0}
-.hero-img{
-  display:block;width:100%;max-height:620px;object-fit:cover;
-  border-radius:24px;box-shadow:var(--shadow);border:1px solid #ffd5e4
-}
-.banner-fallback{
-  min-height:450px;border-radius:24px;padding:50px;
-  align-items:center;background:linear-gradient(135deg,#ffd4e5,#fff);
-  box-shadow:var(--shadow);border:1px solid #ffd5e4
-}
-.banner-fallback span{color:var(--pink);font-weight:800;font-size:28px}
-.banner-fallback h1{font-size:58px;margin:10px 0}
-.banner-fallback p{font-size:20px;color:var(--muted)}
-
-.categories,.products-section,.cart-section{padding:38px 0}
-h1,h2,p{margin-top:0}
-h2{font-size:28px;margin-bottom:8px}
-.categories p,.section-head p{color:var(--muted)}
-.category-bar{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
-.category-btn{
-  border:1px solid var(--line);background:#fff;padding:10px 17px;
-  border-radius:999px;color:var(--text)
-}
-.category-btn.active,.category-btn:hover{background:var(--pink);color:white;border-color:var(--pink)}
-
-.section-head{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:20px}
-#searchInput{
-  width:min(340px,100%);padding:13px 16px;border:1px solid var(--line);
-  border-radius:13px;background:#fff;outline:none
-}
-#searchInput:focus{border-color:var(--pink);box-shadow:0 0 0 3px #e91e6320}
-
-.product-grid{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:18px
-}
-.product-card{
-  background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;
-  box-shadow:0 5px 20px rgba(87,25,51,.06);transition:.2s
-}
-.product-card:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
-.product-img{width:100%;height:260px;object-fit:cover;background:#ffeaf2}
-.product-body{padding:16px}
-.product-title{font-weight:800;margin:0 0 8px}
-.product-desc{font-size:13px;color:var(--muted);min-height:40px}
-.price{color:var(--pink);font-weight:800;font-size:18px;margin:12px 0}
-.card-actions{display:flex;gap:8px}
-.primary,.secondary,.danger{
-  border:0;border-radius:11px;padding:11px 15px;font-weight:700
-}
-.primary{background:var(--pink);color:#fff}
-.primary:hover{background:#d81758}
-.secondary{background:#fff0f6;color:var(--pink)}
-.danger{background:#fff0f0;color:#c62828}
-.wide{width:100%;margin-top:14px}
-.empty{
-  background:white;border:1px dashed var(--line);border-radius:15px;
-  padding:35px;text-align:center;color:var(--muted)
-}
-
-.cart-list{display:grid;gap:10px}
-.cart-row{
-  display:flex;align-items:center;justify-content:space-between;gap:15px;
-  padding:13px;background:#fff;border:1px solid var(--line);border-radius:14px
-}
-.cart-info{display:flex;align-items:center;gap:12px}
-.cart-thumb{width:60px;height:60px;border-radius:10px;object-fit:cover}
-.qty{display:flex;align-items:center;gap:7px}
-.qty button{width:30px;height:30px;border:1px solid var(--line);background:white;border-radius:8px}
-.cart-total{
-  margin-top:15px;padding:18px;background:#fff;border-radius:14px;
-  border:1px solid var(--line);display:flex;justify-content:space-between
-}
-
-footer{margin-top:30px;background:#291620;color:#fff;padding:28px 0}
-footer .container{display:flex;justify-content:space-between;gap:20px;color:#f8dce7}
-
-.modal{
-  position:fixed;inset:0;background:#170b1080;z-index:100;
-  display:grid;place-items:center;padding:20px
-}
-.modal[hidden]{display:none}
-.modal-card{
-  width:min(850px,100%);max-height:90vh;overflow:auto;background:#fff;
-  border-radius:20px;padding:25px;position:relative;box-shadow:0 20px 70px #0005
-}
-.modal-close{
-  position:absolute;left:15px;top:12px;border:0;background:#fff0f6;
-  color:var(--pink);width:35px;height:35px;border-radius:50%;font-size:22px
-}
-.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.form-field{display:grid;gap:6px}
-.form-field.full{grid-column:1/-1}
-.form-field input,.form-field textarea,.form-field select{
-  padding:11px;border:1px solid var(--line);border-radius:10px;outline:none
-}
-.admin-products{display:grid;gap:8px;margin-top:20px}
-.admin-product{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  border:1px solid var(--line);padding:10px;border-radius:10px
-}
-.admin-product small{color:var(--muted)}
-
-@media(max-width:900px){
-  .product-grid{grid-template-columns:repeat(2,1fr)}
-}
-@media(max-width:600px){
-  .nav{align-items:flex-start;padding:12px 0;flex-direction:column}
-  nav{width:100%}
-  .hero-img{max-height:400px}
-  .product-grid{grid-template-columns:1fr}
-  .section-head{align-items:stretch;flex-direction:column}
-  #searchInput{width:100%}
-  .admin-grid{grid-template-columns:1fr}
-  .form-field.full{grid-column:auto}
-  .banner-fallback{padding:25px;min-height:320px}
-  .banner-fallback h1{font-size:38px}
-}
-'''
-
-app_js = r'''const KEY = "alf_shop_products_v1";
-const CART_KEY = "alf_shop_cart_v1";
-const ADMIN_PASSWORD = "fal";
-
-const defaultProducts = [
-  {id:1,name:"شومیز سفید زنانه",cat:"شومیز",price:890000,desc:"شومیز شیک و راحت برای استفاده روزمره.",image:"./assets/product1.jpg"},
-  {id:2,name:"مانتو زنانه",cat:"مانتو",price:1490000,desc:"مدل ساده و کاربردی برای استایل روزانه.",image:"./assets/product2.jpg"},
-  {id:3,name:"ست زنانه صورتی",cat:"ست زنانه",price:1290000,desc:"ست هماهنگ و شیک برای استایل راحت.",image:"./assets/product3.jpg"},
-  {id:4,name:"پیراهن زنانه",cat:"پیراهن",price:1090000,desc:"پیراهن سبک و مناسب استفاده روزمره.",image:"./assets/product4.jpg"}
-];
-
-let products = JSON.parse(localStorage.getItem(KEY) || "null") || defaultProducts;
-let cart = JSON.parse(localStorage.getItem(CART_KEY) || "[]");
-let activeCategory = "همه";
-let query = "";
-
-const $ = id => document.getElementById(id);
-const toman = n => new Intl.NumberFormat("fa-IR").format(n) + " تومان";
-const saveProducts = () => localStorage.setItem(KEY, JSON.stringify(products));
-const saveCart = () => localStorage.setItem(CART_KEY, JSON.stringify(cart));
-
-function escapeHtml(value){
-  return String(value).replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[c]));
-}
-
-function renderCategories(){
-  const cats = ["همه", ...new Set(products.map(p=>p.cat))];
-  $("categoryBar").innerHTML = cats.map(c =>
-    `<button class="category-btn ${c===activeCategory?"active":""}" data-cat="${escapeHtml(c)}">${escapeHtml(c)}</button>`
-  ).join("");
-  document.querySelectorAll("[data-cat]").forEach(btn=>{
-    btn.onclick=()=>{activeCategory=btn.dataset.cat;renderAll();}
-  });
-}
-
-function filteredProducts(){
-  return products.filter(p=>{
-    const catOk = activeCategory==="همه" || p.cat===activeCategory;
-    const q = query.trim().toLowerCase();
-    const searchOk = !q || p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q);
-    return catOk && searchOk;
-  });
-}
-
-function renderProducts(){
-  const list=filteredProducts();
-  $("productSummary").textContent = `${list.length.toLocaleString("fa-IR")} محصول`;
-  $("emptyProducts").hidden=list.length!==0;
-  $("productGrid").innerHTML=list.map(p=>`
-    <article class="product-card">
-      <img class="product-img" src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}"
-           onerror="this.src='./assets/banner.jpg'">
-      <div class="product-body">
-        <h3 class="product-title">${escapeHtml(p.name)}</h3>
-        <div class="product-desc">${escapeHtml(p.desc)}</div>
-        <div class="price">${toman(p.price)}</div>
-        <div class="card-actions">
-          <button class="primary add-cart" data-id="${p.id}">🛒 افزودن به سبد</button>
-        </div>
-      </div>
-    </article>
-  `).join("");
-  document.querySelectorAll(".add-cart").forEach(b=>b.onclick=()=>addToCart(Number(b.dataset.id)));
-}
-
-function addToCart(id){
-  const item=cart.find(x=>x.id===id);
-  if(item)item.qty++;
-  else cart.push({id,qty:1});
-  saveCart();renderCart();
-  alert("محصول به سبد خرید اضافه شد.");
-}
-
-function renderCart(){
-  const rows=cart.map(item=>{
-    const p=products.find(x=>x.id===item.id);
-    if(!p)return "";
-    return `<div class="cart-row">
-      <div class="cart-info">
-        <img class="cart-thumb" src="${escapeHtml(p.image)}" onerror="this.src='./assets/banner.jpg'">
-        <div><strong>${escapeHtml(p.name)}</strong><div>${toman(p.price)}</div></div>
-      </div>
-      <div class="qty">
-        <button data-minus="${p.id}">−</button><strong>${item.qty.toLocaleString("fa-IR")}</strong>
-        <button data-plus="${p.id}">+</button>
-        <button class="danger" data-remove="${p.id}">حذف</button>
-      </div>
-    </div>`;
-  }).join("");
-  $("cartList").innerHTML=rows || `<div class="empty">سبد خرید خالی است.</div>`;
-  let total=0,count=0;
-  cart.forEach(i=>{const p=products.find(x=>x.id===i.id);if(p){total+=p.price*i.qty;count+=i.qty;}});
-  $("cartTotal").textContent=toman(total);
-  $("cartCount").textContent=count.toLocaleString("fa-IR");
-
-  document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>changeQty(Number(b.dataset.plus),1));
-  document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>changeQty(Number(b.dataset.minus),-1));
-  document.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>removeCart(Number(b.dataset.remove)));
-}
-function changeQty(id,d){
-  const x=cart.find(i=>i.id===id); if(!x)return;
-  x.qty+=d;if(x.qty<=0)cart=cart.filter(i=>i.id!==id);
-  saveCart();renderCart();
-}
-function removeCart(id){cart=cart.filter(i=>i.id!==id);saveCart();renderCart();}
-
-function openModal(html){
-  $("modalContent").innerHTML=html;$("modal").hidden=false;
-}
-function closeModal(){$("modal").hidden=true}
-document.querySelectorAll("[data-close]").forEach(x=>x.onclick=closeModal);
-$("modal").onclick=e=>{if(e.target===$("modal"))closeModal()};
-
-function loginAdmin(){
-  openModal(`<h2>🔐 ورود به پنل مدیریت الف شاپ</h2>
-    <p>رمز مدیریت را وارد کنید.</p>
-    <input id="adminPass" type="password" placeholder="رمز مدیریت" style="width:100%;padding:12px;border:1px solid #f2d8e2;border-radius:10px">
-    <button id="loginSubmit" class="primary wide">ورود</button>
-    <p id="loginError" style="color:#c62828"></p>`);
-  $("loginSubmit").onclick=()=>{
-    if($("adminPass").value===ADMIN_PASSWORD) adminPanel();
-    else $("loginError").textContent="رمز واردشده صحیح نیست.";
-  };
-}
-
-function adminPanel(){
-  openModal(`<h2>⚙️ پنل مدیریت الف شاپ</h2>
-    <p>از این بخش می‌توانی محصول اضافه یا حذف کنی. اطلاعات در همین مرورگر ذخیره می‌شود.</p>
-    <form id="productForm" class="admin-grid">
-      <label class="form-field"><span>نام محصول</span><input id="pName" required></label>
-      <label class="form-field"><span>دسته‌بندی</span><input id="pCat" required placeholder="مثلاً مانتو"></label>
-      <label class="form-field"><span>قیمت (تومان)</span><input id="pPrice" type="number" min="0" required></label>
-      <label class="form-field"><span>مسیر عکس</span><input id="pImage" value="./assets/product1.jpg"></label>
-      <label class="form-field full"><span>توضیحات</span><textarea id="pDesc" required></textarea></label>
-      <button class="primary full" type="submit">➕ افزودن محصول</button>
-    </form>
-    <div class="admin-products">${products.map(p=>`
-      <div class="admin-product">
-        <div><strong>${escapeHtml(p.name)}</strong><br><small>${escapeHtml(p.cat)} — ${toman(p.price)}</small></div>
-        <button class="danger delete-product" data-delete="${p.id}">🗑 حذف</button>
-      </div>`).join("")}</div>`);
-  $("productForm").onsubmit=e=>{
-    e.preventDefault();
-    products.push({
-      id:Date.now(),name:$("pName").value.trim(),cat:$("pCat").value.trim(),
-      price:Number($("pPrice").value),desc:$("pDesc").value.trim(),
-      image:$("pImage").value.trim() || "./assets/banner.jpg"
-    });
-    saveProducts();renderAll();adminPanel();
-  };
-  document.querySelectorAll(".delete-product").forEach(b=>b.onclick=()=>{
-    const id=Number(b.dataset.delete);
-    if(confirm("این محصول حذف شود؟")){
-      products=products.filter(p=>p.id!==id);
-      cart=cart.filter(i=>i.id!==id);
-      saveProducts();saveCart();renderAll();adminPanel();
-    }
-  });
-}
-
-function renderAll(){renderCategories();renderProducts();renderCart();}
-$("adminBtn").onclick=loginAdmin;
-$("searchInput").oninput=e=>{query=e.target.value;renderProducts()};
-$("clearCartBtn").onclick=()=>{if(confirm("سبد خرید خالی شود؟")){cart=[];saveCart();renderCart();}};
-$("orderBtn").onclick=()=>{
-  if(!cart.length){alert("سبد خرید خالی است.");return;}
-  alert("سفارش شما ثبت شد. برای اتصال به درگاه یا ارسال سفارش باید بخش سفارش آنلاین به بک‌اند متصل شود.");
-};
-
-renderAll();
-'''
-
-readme = r'''# الف شاپ
-
-فروشگاه استاتیک پوشاک زنانه با HTML/CSS/JavaScript.
-
-## ساختار
-- index.html
-- style.css
-- app.js
-- assets/banner.jpg
-- assets/product1.jpg ... product4.jpg
-
-## پنل مدیریت
-رمز پنل: `fal`
-
-محصولات و سبد خرید در `localStorage` مرورگر ذخیره می‌شوند.
-برای انتشار در GitHub Pages، این فایل‌ها را در ریشه Repository قرار بده.
-
-نکته: پنل مدیریت سمت کاربر است و برای فروشگاه واقعی با اطلاعات حساس مناسب نیست؛ برای امنیت واقعی باید بک‌اند و احراز هویت سمت سرور اضافه شود.
-'''
-
-for name, data in {
-    "index.html": index_html,
-    "style.css": style_css,
-    "app.js": app_js,
-    "README.txt": readme
-}.items():
-    with open(os.path.join(root,name),"w",encoding="utf-8") as f:
-        f.write(data)
-
-# Use the uploaded banner if available in the mounted conversation files; otherwise create simple placeholders.
-possible = []
-for base in ["/mnt/data", "/mnt/data/assets"]:
-    if os.path.exists(base):
-        for fn in os.listdir(base):
-            if fn.lower().endswith((".jpg",".jpeg",".png",".webp")):
-                possible.append(os.path.join(base,fn))
-
-# Pick a likely user banner if present.
-banner_src = next((p for p in possible if "banner" in os.path.basename(p).lower()), None)
-if banner_src and os.path.isfile(banner_src):
-    import shutil
-    shutil.copy2(banner_src, os.path.join(assets,"banner.jpg"))
-else:
-    # Small generated placeholder banner so the ZIP always has the expected asset.
-    from PIL import Image, ImageDraw, ImageFont
-    im=Image.new("RGB",(1200,500),(255,210,228))
-    d=ImageDraw.Draw(im)
-    try:
-        font=ImageFont.truetype("DejaVuSans.ttf",72)
-        small=ImageFont.truetype("DejaVuSans.ttf",34)
-    except:
-        font=small=None
-    d.text((70,150),"ALF SHOP",fill=(210,30,95),font=font)
-    d.text((75,250),"فروشگاه آنلاین پوشاک زنانه",fill=(70,40,50),font=small)
-    im.save(os.path.join(assets,"banner.jpg"),quality=90)
-
-# Product placeholders derived from banner for working demo.
-from PIL import Image, ImageDraw
-im=Image.open(os.path.join(assets,"banner.jpg")).convert("RGB")
-w,h=im.size
-for i in range(1,5):
-    crop=im.crop((int((i-1)*w/4),0,int(i*w/4),h))
-    crop=crop.resize((700,700))
-    crop.save(os.path.join(assets,f"product{i}.jpg"),quality=88)
-
-zip_path="/mnt/data/alf_shop_complete.zip"
-with zipfile.ZipFile(zip_path,"w",zipfile.ZIP_DEFLATED) as z:
-    for dirpath,_,files in os.walk(root):
-        for fn in files:
-            path=os.path.join(dirpath,fn)
-            z.write(path,os.path.relpath(path,root))
-
-zip_path

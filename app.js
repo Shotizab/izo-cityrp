@@ -6,8 +6,8 @@
 
 const ADMIN_PASSWORD = "fal";
 
-const PRODUCTS_KEY = "alf_shop_products";
-const CART_KEY = "alf_shop_cart";
+const PRODUCTS_KEY = "alf_shop_products_v3";
+const CART_KEY = "alf_shop_cart_v3";
 
 
 /* =========================
@@ -15,89 +15,96 @@ const CART_KEY = "alf_shop_cart";
 ========================= */
 
 const defaultProducts = [
-    {
-        id: 1,
-        name: "شومیز سفید زنانه",
-        category: "شومیز",
-        price: 890000,
-        image: "",
-        description: "شومیز سفید شیک و مناسب استفاده روزمره."
-    },
-    {
-        id: 2,
-        name: "مانتو زنانه",
-        category: "مانتو",
-        price: 1290000,
-        image: "",
-        description: "مانتو زنانه با طراحی ساده و شیک."
-    },
-    {
-        id: 3,
-        name: "ست زنانه",
-        category: "ست زنانه",
-        price: 1490000,
-        image: "",
-        description: "ست زنانه راحت و مناسب استایل روزانه."
-    },
-    {
-        id: 4,
-        name: "لباس زنانه",
-        category: "لباس زنانه",
-        price: 1190000,
-        image: "",
-        description: "لباس زنانه با طراحی جدید."
-    }
+
+  {
+    id: 1,
+    name: "شومیز سفید زنانه",
+    price: 890000,
+    category: "شومیز",
+    image: "",
+    description: "شومیز سفید شیک و مناسب استفاده روزمره."
+  },
+
+  {
+    id: 2,
+    name: "مانتو زنانه",
+    price: 1290000,
+    category: "مانتو",
+    image: "",
+    description: "مانتو زنانه با طراحی ساده و شیک."
+  },
+
+  {
+    id: 3,
+    name: "ست زنانه",
+    price: 1490000,
+    category: "ست زنانه",
+    image: "",
+    description: "ست زنانه راحت و مناسب استایل روزانه."
+  },
+
+  {
+    id: 4,
+    name: "لباس زنانه",
+    price: 1190000,
+    category: "لباس زنانه",
+    image: "",
+    description: "لباس زنانه با طراحی جدید."
+  },
+
+  {
+    id: 5,
+    name: "کیف زنانه",
+    price: 790000,
+    category: "اکسسوری",
+    image: "",
+    description: "کیف زنانه مناسب استایل روزمره."
+  }
+
 ];
 
 
 /* =========================
-   LOAD DATA
+   LOAD
 ========================= */
 
-function loadProducts() {
-    try {
-        const saved = localStorage.getItem(PRODUCTS_KEY);
+function loadData(key, fallback) {
 
-        if (!saved) {
-            return [...defaultProducts];
-        }
+  try {
 
-        const parsed = JSON.parse(saved);
+    const data = localStorage.getItem(key);
 
-        if (!Array.isArray(parsed)) {
-            return [...defaultProducts];
-        }
-
-        return parsed;
-
-    } catch (error) {
-        console.error("Products load error:", error);
-        return [...defaultProducts];
+    if (!data) {
+      return fallback;
     }
+
+    const parsed = JSON.parse(data);
+
+    return parsed;
+
+  } catch (error) {
+
+    console.error(error);
+
+    return fallback;
+
+  }
+
 }
 
 
-function loadCart() {
-    try {
-        const saved = localStorage.getItem(CART_KEY);
-
-        if (!saved) {
-            return [];
-        }
-
-        const parsed = JSON.parse(saved);
-
-        return Array.isArray(parsed) ? parsed : [];
-
-    } catch (error) {
-        console.error("Cart load error:", error);
-        return [];
-    }
-}
+let products =
+  loadData(
+    PRODUCTS_KEY,
+    [...defaultProducts]
+  );
 
 
-let products = loadProducts();
-let cart = loadCart();
+let cart =
+  loadData(
+    CART_KEY,
+    []
+  );
 
 
 /* =========================
@@ -105,299 +112,374 @@ let cart = loadCart();
 ========================= */
 
 function saveProducts() {
-    localStorage.setItem(
-        PRODUCTS_KEY,
-        JSON.stringify(products)
-    );
+
+  localStorage.setItem(
+    PRODUCTS_KEY,
+    JSON.stringify(products)
+  );
+
 }
 
 
 function saveCart() {
-    localStorage.setItem(
-        CART_KEY,
-        JSON.stringify(cart)
-    );
+
+  localStorage.setItem(
+    CART_KEY,
+    JSON.stringify(cart)
+  );
+
 }
 
 
 /* =========================
-   DOM
+   ELEMENTS
 ========================= */
 
 const productsGrid =
-    document.getElementById("productsGrid");
+  document.getElementById("productsGrid");
 
-const emptyState =
-    document.getElementById("emptyState");
+const emptyProducts =
+  document.getElementById("emptyProducts");
 
 const searchInput =
-    document.getElementById("searchInput");
+  document.getElementById("searchInput");
 
 const sortSelect =
-    document.getElementById("sortSelect");
+  document.getElementById("sortSelect");
 
-const categoryButtons =
-    document.querySelectorAll(".category");
+const categories =
+  document.querySelectorAll(".category");
 
-const productsBtn =
-    document.getElementById("productsBtn");
+const showProducts =
+  document.getElementById("showProducts");
 
-const cartBtn =
-    document.getElementById("cartBtn");
+
+/* CART */
+
+const cartButton =
+  document.getElementById("cartButton");
 
 const cartCount =
-    document.getElementById("cartCount");
+  document.getElementById("cartCount");
 
 const cartPanel =
-    document.getElementById("cartPanel");
-
-const overlay =
-    document.getElementById("overlay");
-
-const closeCart =
-    document.getElementById("closeCart");
+  document.getElementById("cartPanel");
 
 const cartItems =
-    document.getElementById("cartItems");
+  document.getElementById("cartItems");
 
-const cartEmpty =
-    document.getElementById("cartEmpty");
+const emptyCart =
+  document.getElementById("emptyCart");
 
 const cartTotal =
-    document.getElementById("cartTotal");
+  document.getElementById("cartTotal");
 
-const checkoutBtn =
-    document.getElementById("checkoutBtn");
+const closeCart =
+  document.getElementById("closeCart");
 
-const adminBtn =
-    document.getElementById("adminBtn");
+const checkoutButton =
+  document.getElementById("checkoutButton");
+
+const overlay =
+  document.getElementById("overlay");
+
+
+/* ADMIN */
+
+const adminButton =
+  document.getElementById("adminButton");
 
 const adminModal =
-    document.getElementById("adminModal");
+  document.getElementById("adminModal");
 
 const closeAdmin =
-    document.getElementById("closeAdmin");
+  document.getElementById("closeAdmin");
 
-const loginBox =
-    document.getElementById("loginBox");
+const adminLogin =
+  document.getElementById("adminLogin");
 
-const adminPanel =
-    document.getElementById("adminPanel");
+const adminDashboard =
+  document.getElementById("adminDashboard");
 
 const adminPassword =
-    document.getElementById("adminPassword");
+  document.getElementById("adminPassword");
 
-const loginBtn =
-    document.getElementById("loginBtn");
+const loginButton =
+  document.getElementById("loginButton");
 
 const loginError =
-    document.getElementById("loginError");
+  document.getElementById("loginError");
 
-const logoutBtn =
-    document.getElementById("logoutBtn");
+const logoutButton =
+  document.getElementById("logoutButton");
 
-const pName =
-    document.getElementById("pName");
+const productName =
+  document.getElementById("productName");
 
-const pPrice =
-    document.getElementById("pPrice");
+const productPrice =
+  document.getElementById("productPrice");
 
-const pCategory =
-    document.getElementById("pCategory");
+const productCategory =
+  document.getElementById("productCategory");
 
-const pImage =
-    document.getElementById("pImage");
+const productImage =
+  document.getElementById("productImage");
 
-const pDescription =
-    document.getElementById("pDescription");
+const productDescription =
+  document.getElementById("productDescription");
 
-const addProductBtn =
-    document.getElementById("addProductBtn");
+const addProduct =
+  document.getElementById("addProduct");
 
 const adminProducts =
-    document.getElementById("adminProducts");
+  document.getElementById("adminProducts");
 
-const adminCount =
-    document.getElementById("adminCount");
+const productNumber =
+  document.getElementById("productNumber");
 
 const toast =
-    document.getElementById("toast");
+  document.getElementById("toast");
 
 
 /* =========================
-   FORMAT
+   HELPERS
 ========================= */
 
-function money(value) {
-    return new Intl.NumberFormat("fa-IR").format(value) + " تومان";
+function formatPrice(price) {
+
+  return new Intl.NumberFormat("fa-IR")
+    .format(Number(price)) + " تومان";
+
 }
 
 
 function escapeHTML(value) {
 
-    const div = document.createElement("div");
+  const div =
+    document.createElement("div");
 
-    div.textContent = String(value ?? "");
+  div.textContent =
+    String(value ?? "");
 
-    return div.innerHTML;
+  return div.innerHTML;
+
+}
+
+
+function showToast(message) {
+
+  toast.textContent = message;
+
+  toast.classList.add("show");
+
+  clearTimeout(showToast.timer);
+
+  showToast.timer =
+    setTimeout(() => {
+
+      toast.classList.remove("show");
+
+    }, 2200);
+
 }
 
 
 /* =========================
-   PRODUCT IMAGE
+   IMAGE
 ========================= */
 
-function imageHTML(product) {
+function productImageHTML(product) {
 
-    if (!product.image) {
-        return `
-            <div class="image-placeholder">
-                👗
-            </div>
-        `;
-    }
+  if (!product.image) {
 
     return `
-        <img
-            src="${escapeHTML(product.image)}"
-            alt="${escapeHTML(product.name)}"
-            onerror="this.outerHTML='<div class=&quot;image-placeholder&quot;>👗</div>'"
-        >
+      <div class="image-placeholder">
+        👗
+      </div>
     `;
+
+  }
+
+  return `
+    <img
+      src="${escapeHTML(product.image)}"
+      alt="${escapeHTML(product.name)}"
+      onerror="this.style.display='none';"
+    >
+  `;
+
 }
 
 
 /* =========================
-   RENDER PRODUCTS
+   PRODUCTS
 ========================= */
 
 function renderProducts() {
 
-    const search =
-        searchInput.value.trim().toLowerCase();
-
-    const activeCategory =
-        document.querySelector(".category.active");
-
-    const category =
-        activeCategory
-            ? activeCategory.dataset.category
-            : "همه";
+  const search =
+    searchInput.value
+      .trim()
+      .toLowerCase();
 
 
-    let list = products.filter(product => {
+  const activeCategory =
+    document.querySelector(
+      ".category.active"
+    );
 
-        const name =
-            String(product.name).toLowerCase();
 
-        const description =
-            String(product.description).toLowerCase();
+  const selectedCategory =
+    activeCategory
+      ? activeCategory.dataset.category
+      : "همه";
 
-        const matchesSearch =
-            name.includes(search) ||
-            description.includes(search);
 
-        const matchesCategory =
-            category === "همه" ||
-            product.category === category;
+  let result =
+    products.filter(product => {
 
-        return matchesSearch && matchesCategory;
+      const name =
+        String(product.name)
+          .toLowerCase();
+
+      const description =
+        String(product.description)
+          .toLowerCase();
+
+
+      const matchesSearch =
+        !search ||
+        name.includes(search) ||
+        description.includes(search);
+
+
+      const matchesCategory =
+        selectedCategory === "همه" ||
+        product.category === selectedCategory;
+
+
+      return (
+        matchesSearch &&
+        matchesCategory
+      );
+
     });
 
 
-    /* SORT */
+  /* SORT */
 
-    if (sortSelect.value === "cheap") {
+  if (sortSelect.value === "cheap") {
 
-        list.sort((a,b) => a.price - b.price);
+    result.sort(
+      (a, b) => a.price - b.price
+    );
 
-    } else if (sortSelect.value === "expensive") {
+  }
 
-        list.sort((a,b) => b.price - a.price);
+  else if (sortSelect.value === "expensive") {
 
-    } else if (sortSelect.value === "newest") {
+    result.sort(
+      (a, b) => b.price - a.price
+    );
 
-        list.sort((a,b) => b.id - a.id);
-    }
+  }
 
+  else if (sortSelect.value === "newest") {
 
-    if (list.length === 0) {
+    result.sort(
+      (a, b) => b.id - a.id
+    );
 
-        productsGrid.innerHTML = "";
-
-        emptyState.classList.remove("hidden");
-
-        return;
-    }
-
-
-    emptyState.classList.add("hidden");
+  }
 
 
-    productsGrid.innerHTML =
-        list.map(product => {
+  if (result.length === 0) {
 
-            return `
-                <article class="product-card">
+    productsGrid.innerHTML = "";
 
-                    <div class="product-image">
+    emptyProducts.classList.remove("hidden");
 
-                        ${imageHTML(product)}
+    return;
 
-                        <span class="product-category">
-                            ${escapeHTML(product.category)}
-                        </span>
-
-                    </div>
+  }
 
 
-                    <div class="product-info">
-
-                        <h3>
-                            ${escapeHTML(product.name)}
-                        </h3>
-
-                        <p class="description">
-                            ${escapeHTML(product.description)}
-                        </p>
+  emptyProducts.classList.add("hidden");
 
 
-                        <div class="product-bottom">
+  productsGrid.innerHTML =
+    result.map(product => {
 
-                            <strong class="price">
-                                ${money(product.price)}
-                            </strong>
+      return `
 
-                            <button
-                                class="add-btn"
-                                data-add="${product.id}"
-                            >
-                                🛒 افزودن
-                            </button>
+        <article class="product-card">
 
-                        </div>
+          <div class="product-image">
 
-                    </div>
+            ${productImageHTML(product)}
 
-                </article>
-            `;
+            <span class="product-category">
+              ${escapeHTML(product.category)}
+            </span>
 
-        }).join("");
+          </div>
 
 
-    document
-        .querySelectorAll("[data-add]")
-        .forEach(button => {
+          <div class="product-content">
 
-            button.addEventListener("click", () => {
+            <h3>
+              ${escapeHTML(product.name)}
+            </h3>
 
-                addToCart(
-                    Number(button.dataset.add)
-                );
+            <p class="product-description">
+              ${escapeHTML(product.description)}
+            </p>
 
-            });
 
-        });
+            <div class="product-bottom">
+
+              <strong class="product-price">
+                ${formatPrice(product.price)}
+              </strong>
+
+              <button
+                class="add-to-cart"
+                data-add-cart="${product.id}"
+              >
+                🛒 افزودن
+              </button>
+
+            </div>
+
+          </div>
+
+        </article>
+
+      `;
+
+    }).join("");
+
+
+  document
+    .querySelectorAll("[data-add-cart]")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          const id =
+            Number(
+              button.dataset.addCart
+            );
+
+          addToCart(id);
+
+        }
+      );
+
+    });
+
 }
 
 
@@ -405,52 +487,63 @@ function renderProducts() {
    CATEGORY
 ========================= */
 
-categoryButtons.forEach(button => {
+categories.forEach(button => {
 
-    button.addEventListener("click", () => {
+  button.addEventListener(
+    "click",
+    () => {
 
-        categoryButtons.forEach(item => {
-            item.classList.remove("active");
-        });
+      categories.forEach(item => {
 
-        button.classList.add("active");
+        item.classList.remove(
+          "active"
+        );
 
-        renderProducts();
+      });
 
-    });
+
+      button.classList.add("active");
+
+      renderProducts();
+
+    }
+  );
 
 });
 
 
 /* =========================
-   SEARCH / SORT
+   SEARCH
 ========================= */
 
 searchInput.addEventListener(
-    "input",
-    renderProducts
+  "input",
+  renderProducts
 );
 
+
 sortSelect.addEventListener(
-    "change",
-    renderProducts
+  "change",
+  renderProducts
 );
 
 
 /* =========================
-   PRODUCTS BUTTON
+   SHOW PRODUCTS
 ========================= */
 
-productsBtn.addEventListener("click", () => {
+showProducts.addEventListener(
+  "click",
+  () => {
 
     document
-        .getElementById("products")
-        .scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-        });
+      .getElementById("products")
+      .scrollIntoView({
+        behavior: "smooth"
+      });
 
-});
+  }
+);
 
 
 /* =========================
@@ -459,346 +552,417 @@ productsBtn.addEventListener("click", () => {
 
 function addToCart(id) {
 
-    const product =
-        products.find(p => p.id === id);
-
-    if (!product) {
-        return;
-    }
+  const product =
+    products.find(
+      item => item.id === id
+    );
 
 
-    const item =
-        cart.find(item => item.id === id);
+  if (!product) {
+    return;
+  }
 
 
-    if (item) {
-        item.quantity += 1;
-    } else {
-        cart.push({
-            id: id,
-            quantity: 1
-        });
-    }
+  const existing =
+    cart.find(
+      item => item.id === id
+    );
 
 
-    saveCart();
+  if (existing) {
 
-    renderCart();
+    existing.quantity++;
 
-    showToast("محصول به سبد اضافه شد 💗");
+  }
+
+  else {
+
+    cart.push({
+      id: id,
+      quantity: 1
+    });
+
+  }
+
+
+  saveCart();
+
+  renderCart();
+
+  showToast(
+    "محصول به سبد خرید اضافه شد 💗"
+  );
 
 }
 
 
 function renderCart() {
 
-    if (cart.length === 0) {
-
-        cartItems.innerHTML = "";
-
-        cartEmpty.style.display = "flex";
-
-        cartCount.textContent = "0";
-
-        cartTotal.textContent = "۰ تومان";
-
-        return;
-    }
+  let total = 0;
+  let count = 0;
 
 
-    cartEmpty.style.display = "none";
+  if (cart.length === 0) {
 
+    cartItems.innerHTML = "";
 
-    let total = 0;
-    let count = 0;
-
-
-    cartItems.innerHTML =
-        cart.map(item => {
-
-            const product =
-                products.find(
-                    p => p.id === item.id
-                );
-
-
-            if (!product) {
-                return "";
-            }
-
-
-            total +=
-                product.price * item.quantity;
-
-            count += item.quantity;
-
-
-            return `
-                <div class="cart-item">
-
-                    ${
-                        product.image
-                        ?
-                        `<img
-                            src="${escapeHTML(product.image)}"
-                            alt="${escapeHTML(product.name)}"
-                        >`
-                        :
-                        `<div class="image-placeholder">
-                            👗
-                        </div>`
-                    }
-
-
-                    <div class="cart-item-info">
-
-                        <b>
-                            ${escapeHTML(product.name)}
-                        </b>
-
-                        <span class="cart-item-price">
-                            ${money(product.price)}
-                        </span>
-
-
-                        <div class="qty">
-
-                            <button
-                                data-plus="${product.id}"
-                            >
-                                +
-                            </button>
-
-                            <span>
-                                ${item.quantity}
-                            </span>
-
-                            <button
-                                data-minus="${product.id}"
-                            >
-                                -
-                            </button>
-
-                            <button
-                                class="remove"
-                                data-remove="${product.id}"
-                            >
-                                حذف
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                </div>
-            `;
-
-        }).join("");
-
+    emptyCart.style.display =
+      "flex";
 
     cartCount.textContent =
-        String(count);
-
+      "0";
 
     cartTotal.textContent =
-        money(total);
+      "۰ تومان";
+
+    return;
+
+  }
 
 
-    document
-        .querySelectorAll("[data-plus]")
-        .forEach(button => {
-
-            button.addEventListener("click", () => {
-
-                changeQuantity(
-                    Number(button.dataset.plus),
-                    1
-                );
-
-            });
-
-        });
+  emptyCart.style.display =
+    "none";
 
 
-    document
-        .querySelectorAll("[data-minus]")
-        .forEach(button => {
+  cartItems.innerHTML =
+    cart.map(item => {
 
-            button.addEventListener("click", () => {
-
-                changeQuantity(
-                    Number(button.dataset.minus),
-                    -1
-                );
-
-            });
-
-        });
+      const product =
+        products.find(
+          p => p.id === item.id
+        );
 
 
-    document
-        .querySelectorAll("[data-remove]")
-        .forEach(button => {
+      if (!product) {
+        return "";
+      }
 
-            button.addEventListener("click", () => {
 
-                removeFromCart(
-                    Number(button.dataset.remove)
-                );
+      total +=
+        product.price *
+        item.quantity;
 
-            });
 
-        });
+      count +=
+        item.quantity;
+
+
+      return `
+
+        <div class="cart-item">
+
+          <div class="cart-item-image">
+
+            ${
+              product.image
+              ?
+              `<img
+                src="${escapeHTML(product.image)}"
+                alt=""
+              >`
+              :
+              "👗"
+            }
+
+          </div>
+
+
+          <div class="cart-item-info">
+
+            <strong>
+              ${escapeHTML(product.name)}
+            </strong>
+
+            <span class="cart-item-price">
+              ${formatPrice(product.price)}
+            </span>
+
+
+            <div class="quantity">
+
+              <button
+                data-plus="${product.id}"
+              >
+                +
+              </button>
+
+              <span>
+                ${item.quantity}
+              </span>
+
+              <button
+                data-minus="${product.id}"
+              >
+                -
+              </button>
+
+              <button
+                class="remove-item"
+                data-remove="${product.id}"
+              >
+                حذف
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+
+
+  cartCount.textContent =
+    String(count);
+
+
+  cartTotal.textContent =
+    formatPrice(total);
+
+
+  document
+    .querySelectorAll("[data-plus]")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          changeQuantity(
+            Number(button.dataset.plus),
+            1
+          );
+
+        }
+      );
+
+    });
+
+
+  document
+    .querySelectorAll("[data-minus]")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          changeQuantity(
+            Number(button.dataset.minus),
+            -1
+          );
+
+        }
+      );
+
+    });
+
+
+  document
+    .querySelectorAll("[data-remove]")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          removeFromCart(
+            Number(button.dataset.remove)
+          );
+
+        }
+      );
+
+    });
 
 }
 
 
 function changeQuantity(id, amount) {
 
-    const item =
-        cart.find(item => item.id === id);
-
-    if (!item) {
-        return;
-    }
+  const item =
+    cart.find(
+      product => product.id === id
+    );
 
 
-    item.quantity += amount;
+  if (!item) {
+    return;
+  }
 
 
-    if (item.quantity <= 0) {
-
-        cart =
-            cart.filter(
-                item => item.id !== id
-            );
-
-    }
+  item.quantity += amount;
 
 
-    saveCart();
+  if (item.quantity <= 0) {
 
-    renderCart();
+    cart =
+      cart.filter(
+        product => product.id !== id
+      );
+
+  }
+
+
+  saveCart();
+
+  renderCart();
+
 }
 
 
 function removeFromCart(id) {
 
-    cart =
-        cart.filter(
-            item => item.id !== id
-        );
+  cart =
+    cart.filter(
+      item => item.id !== id
+    );
 
-    saveCart();
 
-    renderCart();
+  saveCart();
+
+  renderCart();
+
+  showToast(
+    "محصول از سبد حذف شد"
+  );
+
 }
 
 
 /* =========================
-   OPEN / CLOSE CART
+   CART OPEN
 ========================= */
 
 function openCart() {
 
-    cartPanel.classList.add("active");
+  cartPanel.classList.add("show");
 
-    overlay.classList.add("active");
+  overlay.classList.add("show");
 
 }
 
 
 function closeCartPanel() {
 
-    cartPanel.classList.remove("active");
+  cartPanel.classList.remove("show");
 
-    overlay.classList.remove("active");
+  overlay.classList.remove("show");
 
 }
 
 
-cartBtn.addEventListener(
-    "click",
-    openCart
+cartButton.addEventListener(
+  "click",
+  openCart
 );
+
 
 closeCart.addEventListener(
-    "click",
-    closeCartPanel
+  "click",
+  closeCartPanel
 );
 
+
 overlay.addEventListener(
-    "click",
-    closeCartPanel
+  "click",
+  closeCartPanel
 );
 
 
 /* =========================
-   ADMIN OPEN
+   ADMIN
 ========================= */
 
-adminBtn.addEventListener("click", () => {
+function openAdmin() {
 
-    adminModal.classList.add("active");
+  adminModal.classList.add("show");
 
-    loginBox.classList.remove("hidden");
+  adminLogin.classList.remove("hidden");
 
-    adminPanel.classList.add("hidden");
+  adminDashboard.classList.add("hidden");
 
-    loginError.style.display = "none";
+  loginError.classList.remove("show");
 
-    adminPassword.value = "";
+  adminPassword.value = "";
 
-});
+}
 
 
-closeAdmin.addEventListener("click", () => {
+adminButton.addEventListener(
+  "click",
+  openAdmin
+);
 
-    adminModal.classList.remove("active");
 
-});
+closeAdmin.addEventListener(
+  "click",
+  () => {
+
+    adminModal.classList.remove(
+      "show"
+    );
+
+  }
+);
 
 
 /* =========================
    LOGIN
 ========================= */
 
-function loginAdmin() {
+function login() {
 
-    if (adminPassword.value === ADMIN_PASSWORD) {
+  const password =
+    adminPassword.value;
 
-        loginBox.classList.add("hidden");
 
-        adminPanel.classList.remove("hidden");
+  if (password === ADMIN_PASSWORD) {
 
-        loginError.style.display = "none";
+    adminLogin.classList.add(
+      "hidden"
+    );
 
-        renderAdminProducts();
+    adminDashboard.classList.remove(
+      "hidden"
+    );
 
-    } else {
+    loginError.classList.remove(
+      "show"
+    );
 
-        loginError.style.display = "block";
+    renderAdminProducts();
 
-    }
+  }
+
+  else {
+
+    loginError.classList.add(
+      "show"
+    );
+
+  }
 
 }
 
 
-loginBtn.addEventListener(
-    "click",
-    loginAdmin
+loginButton.addEventListener(
+  "click",
+  login
 );
 
 
 adminPassword.addEventListener(
-    "keydown",
-    event => {
+  "keydown",
+  event => {
 
-        if (event.key === "Enter") {
-            loginAdmin();
-        }
-
+    if (event.key === "Enter") {
+      login();
     }
+
+  }
 );
 
 
@@ -806,92 +970,121 @@ adminPassword.addEventListener(
    LOGOUT
 ========================= */
 
-logoutBtn.addEventListener("click", () => {
+logoutButton.addEventListener(
+  "click",
+  () => {
 
-    adminPanel.classList.add("hidden");
+    adminDashboard.classList.add(
+      "hidden"
+    );
 
-    loginBox.classList.remove("hidden");
+    adminLogin.classList.remove(
+      "hidden"
+    );
 
     adminPassword.value = "";
 
-});
+  }
+);
 
 
 /* =========================
    ADD PRODUCT
 ========================= */
 
-addProductBtn.addEventListener(
-    "click",
-    addProduct
+addProduct.addEventListener(
+  "click",
+  createProduct
 );
 
 
-function addProduct() {
+function createProduct() {
 
-    const name =
-        pName.value.trim();
+  const name =
+    productName.value.trim();
 
-    const price =
-        Number(pPrice.value);
+  const price =
+    Number(productPrice.value);
 
-    const category =
-        pCategory.value;
+  const category =
+    productCategory.value;
 
-    const image =
-        pImage.value.trim();
+  const image =
+    productImage.value.trim();
 
-    const description =
-        pDescription.value.trim();
-
-
-    if (!name) {
-        alert("نام محصول را وارد کن.");
-        return;
-    }
+  const description =
+    productDescription.value.trim();
 
 
-    if (!price || price <= 0) {
-        alert("قیمت محصول را وارد کن.");
-        return;
-    }
+  if (!name) {
+
+    alert(
+      "نام محصول را وارد کن."
+    );
+
+    productName.focus();
+
+    return;
+
+  }
 
 
-    const product = {
+  if (!price || price <= 0) {
 
-        id: Date.now(),
+    alert(
+      "قیمت محصول را وارد کن."
+    );
 
-        name: name,
+    productPrice.focus();
 
-        price: price,
+    return;
 
-        category: category,
-
-        image: image,
-
-        description:
-            description ||
-            "محصول جدید الف شاپ"
-
-    };
+  }
 
 
-    products.unshift(product);
+  const newProduct = {
 
-    saveProducts();
+    id: Date.now(),
 
-    renderProducts();
+    name: name,
 
-    renderAdminProducts();
+    price: price,
+
+    category: category,
+
+    image: image,
+
+    description:
+      description ||
+      "محصول جدید الف شاپ"
+
+  };
 
 
-    pName.value = "";
-    pPrice.value = "";
-    pImage.value = "";
-    pDescription.value = "";
+  products.unshift(
+    newProduct
+  );
 
 
-    showToast("محصول با موفقیت اضافه شد ✅");
+  saveProducts();
+
+  renderProducts();
+
+  renderAdminProducts();
+
+
+  productName.value = "";
+
+  productPrice.value = "";
+
+  productImage.value = "";
+
+  productDescription.value = "";
+
+
+  showToast(
+    "محصول با موفقیت اضافه شد ✅"
+  );
 
 }
 
@@ -902,132 +1095,148 @@ function addProduct() {
 
 function renderAdminProducts() {
 
-    adminCount.textContent =
-        products.length;
+  productNumber.textContent =
+    products.length;
 
 
-    if (products.length === 0) {
-
-        adminProducts.innerHTML =
-            "<p>محصولی وجود ندارد.</p>";
-
-        return;
-    }
-
+  if (products.length === 0) {
 
     adminProducts.innerHTML =
-        products.map(product => {
+      `
+        <p style="font-size:11px;color:#917d86">
+          هنوز محصولی اضافه نشده است.
+        </p>
+      `;
 
-            return `
-                <div class="admin-product">
+    return;
 
-                    ${
-                        product.image
-                        ?
-                        `<img
-                            src="${escapeHTML(product.image)}"
-                            alt=""
-                        >`
-                        :
-                        `<div class="image-placeholder">
-                            👗
-                        </div>`
-                    }
+  }
 
 
-                    <div class="admin-product-info">
+  adminProducts.innerHTML =
+    products.map(product => {
 
-                        <b>
-                            ${escapeHTML(product.name)}
-                        </b>
+      return `
 
-                        <span>
-                            ${money(product.price)}
-                        </span>
+        <div class="admin-product">
 
-                    </div>
+          <div class="admin-product-image">
 
+            ${
+              product.image
+              ?
+              `<img
+                src="${escapeHTML(product.image)}"
+                alt=""
+              >`
+              :
+              "👗"
+            }
 
-                    <button
-                        class="delete-btn"
-                        data-delete="${product.id}"
-                    >
-                        🗑️
-                    </button>
-
-                </div>
-            `;
-
-        }).join("");
+          </div>
 
 
-    document
-        .querySelectorAll("[data-delete]")
-        .forEach(button => {
+          <div class="admin-product-info">
 
-            button.addEventListener("click", () => {
+            <strong>
+              ${escapeHTML(product.name)}
+            </strong>
 
-                deleteProduct(
-                    Number(button.dataset.delete)
-                );
+            <span>
+              ${formatPrice(product.price)}
+            </span>
 
-            });
+          </div>
 
-        });
+
+          <button
+            class="delete-product"
+            data-delete="${product.id}"
+          >
+            🗑️
+          </button>
+
+        </div>
+
+      `;
+
+    }).join("");
+
+
+  document
+    .querySelectorAll("[data-delete]")
+    .forEach(button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          deleteProduct(
+            Number(button.dataset.delete)
+          );
+
+        }
+      );
+
+    });
 
 }
 
 
 /* =========================
-   DELETE PRODUCT
+   DELETE
 ========================= */
 
 function deleteProduct(id) {
 
-    const product =
-        products.find(p => p.id === id);
-
-    if (!product) {
-        return;
-    }
+  const product =
+    products.find(
+      item => item.id === id
+    );
 
 
-    const yes =
-        confirm(
-            "محصول «" +
-            product.name +
-            "» حذف شود؟"
-        );
+  if (!product) {
+    return;
+  }
 
 
-    if (!yes) {
-        return;
-    }
+  const confirmed =
+    confirm(
+      `محصول «${product.name}» حذف شود؟`
+    );
 
 
-    products =
-        products.filter(
-            p => p.id !== id
-        );
+  if (!confirmed) {
+    return;
+  }
 
 
-    cart =
-        cart.filter(
-            item => item.id !== id
-        );
+  products =
+    products.filter(
+      item => item.id !== id
+    );
 
 
-    saveProducts();
+  cart =
+    cart.filter(
+      item => item.id !== id
+    );
 
-    saveCart();
 
-    renderProducts();
+  saveProducts();
 
-    renderCart();
+  saveCart();
 
-    renderAdminProducts();
+  renderProducts();
 
-    showToast("محصول حذف شد 🗑️");
+  renderCart();
+
+  renderAdminProducts();
+
+
+  showToast(
+    "محصول حذف شد 🗑️"
+  );
 
 }
 
@@ -1036,52 +1245,50 @@ function deleteProduct(id) {
    CHECKOUT
 ========================= */
 
-checkoutBtn.addEventListener(
-    "click",
-    () => {
+checkoutButton.addEventListener(
+  "click",
+  () => {
 
-        if (cart.length === 0) {
+    if (cart.length === 0) {
 
-            alert(
-                "سبد خرید خالی است."
-            );
+      alert(
+        "سبد خرید خالی است."
+      );
 
-            return;
-        }
-
-
-        alert(
-            "سبد خرید آماده ثبت سفارش است."
-        );
+      return;
 
     }
+
+
+    alert(
+      "سبد خرید آماده ثبت سفارش است. 💗"
+    );
+
+  }
 );
 
 
 /* =========================
-   TOAST
+   ESC KEY
 ========================= */
 
-let toastTimer;
+document.addEventListener(
+  "keydown",
+  event => {
 
-function showToast(message) {
-
-    toast.textContent = message;
-
-    toast.classList.add("show");
-
-
-    clearTimeout(toastTimer);
+    if (event.key !== "Escape") {
+      return;
+    }
 
 
-    toastTimer =
-        setTimeout(() => {
+    closeCartPanel();
 
-            toast.classList.remove("show");
+    adminModal.classList.remove(
+      "show"
+    );
 
-        }, 2200);
-
-}
+  }
+);
 
 
 /* =========================

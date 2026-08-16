@@ -30,8 +30,15 @@
     <nav class="menu">
       <a href="#home">خانه</a>
       <a href="#products">محصولات</a>
-      <button id="cartButton">🛒 سبد خرید <span id="cartCount">0</span></button>
-      <button id="adminButton">⚙️ مدیریت</button>
+
+      <button id="cartButton">
+        🛒 سبد خرید
+        <span id="cartCount">0</span>
+      </button>
+
+      <button id="adminButton">
+        ⚙️ مدیریت
+      </button>
     </nav>
 
   </div>
@@ -59,8 +66,7 @@
       </p>
 
       <button id="showProducts" class="primary-button">
-        مشاهده محصولات
-        <span>←</span>
+        مشاهده محصولات ←
       </button>
 
     </div>
@@ -238,37 +244,19 @@
 
   </div>
 
-
   <div id="cartItems" class="cart-items"></div>
 
-
   <div id="emptyCart" class="empty-cart">
-
     <div>🛒</div>
-
-    <strong>
-      سبد خرید خالیه
-    </strong>
-
-    <small>
-      هنوز محصولی انتخاب نکردی.
-    </small>
-
+    <strong>سبد خرید خالیه</strong>
+    <small>هنوز محصولی انتخاب نکردی.</small>
   </div>
-
 
   <div class="cart-footer">
 
     <div class="total-row">
-
-      <span>
-        مجموع
-      </span>
-
-      <strong id="cartTotal">
-        ۰ تومان
-      </strong>
-
+      <span>مجموع</span>
+      <strong id="cartTotal">۰ تومان</strong>
     </div>
 
     <button id="checkoutButton" class="primary-button full">
@@ -291,8 +279,6 @@
     </button>
 
 
-    <!-- LOGIN -->
-
     <div id="adminLogin" class="admin-login">
 
       <div class="lock-icon">
@@ -300,11 +286,11 @@
       </div>
 
       <h2>
-        پنل مدیریت
+        پنل مدیریت الف شاپ
       </h2>
 
       <p>
-        برای ورود رمز مدیریت را وارد کن
+        رمز مدیریت را وارد کن
       </p>
 
       <input
@@ -318,26 +304,19 @@
       </button>
 
       <div id="loginError" class="login-error">
-        رمز وارد شده اشتباه است.
+        رمز اشتباه است.
       </div>
 
     </div>
 
-
-    <!-- PANEL -->
 
     <div id="adminDashboard" class="hidden">
 
       <div class="dashboard-header">
 
         <div>
-          <span>
-            مدیریت فروشگاه
-          </span>
-
-          <h2>
-            الف شاپ ⚙️
-          </h2>
+          <span>پنل مدیریت</span>
+          <h2>الف شاپ ⚙️</h2>
         </div>
 
         <button id="logoutButton">
@@ -350,9 +329,8 @@
       <div class="admin-box">
 
         <h3>
-          ➕ افزودن محصول جدید
+          ✨ افزودن محصول جدید
         </h3>
-
 
         <label>
           نام محصول
@@ -424,12 +402,12 @@
         <input
           id="productImage"
           type="text"
-          placeholder="https://..."
+          placeholder="https://example.com/photo.jpg"
         >
 
 
         <label>
-          توضیحات محصول
+          توضیحات
         </label>
 
         <textarea
@@ -439,7 +417,7 @@
 
 
         <button id="addProduct" class="primary-button full">
-          افزودن محصول
+          ➕ اضافه کردن محصول
         </button>
 
       </div>
@@ -450,7 +428,7 @@
         <div class="admin-products-title">
 
           <h3>
-            📦 محصولات
+            📦 محصولات فروشگاه
           </h3>
 
           <span id="productNumber">

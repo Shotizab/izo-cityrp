@@ -1,160 +1,220 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الف شاپ | فروشگاه پوشاک زنانه</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>الف شاپ | فروشگاه پوشاک زنانه</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <header class="header">
-    <div class="container header-inner">
+  <div class="container nav">
 
-        <a href="#home" class="logo">
-            <div class="logo-icon">🛍️</div>
-            <div>
-                <b>الف شاپ</b>
-                <small>پوشاک زنانه</small>
-            </div>
-        </a>
+    <a href="#home" class="brand">
+      <div class="brand-icon">🛍️</div>
 
-        <nav>
-            <a href="#home">خانه</a>
-            <a href="#products">محصولات</a>
-            <button id="cartBtn">🛒 سبد <span id="cartCount">0</span></button>
-            <button id="adminBtn">⚙️ مدیریت</button>
-        </nav>
+      <div>
+        <strong>الف شاپ</strong>
+        <small>فروشگاه پوشاک زنانه</small>
+      </div>
+    </a>
 
-    </div>
+    <nav class="menu">
+      <a href="#home">خانه</a>
+      <a href="#products">محصولات</a>
+      <button id="cartButton">🛒 سبد خرید <span id="cartCount">0</span></button>
+      <button id="adminButton">⚙️ مدیریت</button>
+    </nav>
+
+  </div>
 </header>
 
 
 <main id="home">
 
-    <section class="hero container">
+  <section class="hero container">
 
-        <div class="hero-content">
-            <span class="badge">✨ کالکشن جدید الف شاپ</span>
+    <div class="hero-text">
 
-            <h1>
-                استایل شیک،
-                <span>انتخاب خاص</span>
-            </h1>
+      <div class="new-badge">
+        ✨ کالکشن جدید الف شاپ
+      </div>
 
-            <p>
-                جدیدترین مدل‌های پوشاک زنانه را در الف شاپ ببین.
-            </p>
+      <h1>
+        استایل خاص
+        <span>برای تو 💗</span>
+      </h1>
 
-            <button class="main-btn" id="productsBtn">
-                مشاهده محصولات
-            </button>
-        </div>
+      <p>
+        جدیدترین مدل‌های پوشاک زنانه،
+        شیک و مناسب برای استایل روزمره و خاص.
+      </p>
 
-        <div class="hero-art">
-            <div class="big-bag">🛍️</div>
-            <div class="heart">♥</div>
-            <div class="sparkle">✦</div>
-        </div>
+      <button id="showProducts" class="primary-button">
+        مشاهده محصولات
+        <span>←</span>
+      </button>
 
-    </section>
+    </div>
 
+    <div class="hero-image">
 
-    <section class="features container">
+      <div class="dress-card">
+        👗
+      </div>
 
-        <div>
-            <span>👗</span>
-            <b>مد روز</b>
-            <small>مدل‌های جدید</small>
-        </div>
+      <div class="floating-card card-one">
+        💕
+      </div>
 
-        <div>
-            <span>💗</span>
-            <b>قیمت مناسب</b>
-            <small>خرید اقتصادی</small>
-        </div>
+      <div class="floating-card card-two">
+        ✨
+      </div>
 
-        <div>
-            <span>✨</span>
-            <b>کیفیت خوب</b>
-            <small>انتخاب مطمئن</small>
-        </div>
+    </div>
 
-        <div>
-            <span>🛍️</span>
-            <b>سفارش آسان</b>
-            <small>سریع و ساده</small>
-        </div>
-
-    </section>
+  </section>
 
 
-    <section class="container products-section" id="products">
+  <section class="advantages container">
 
-        <div class="section-title">
-            <span>فروشگاه</span>
-            <h2>محصولات الف شاپ 💕</h2>
-            <p>محصول مورد علاقه‌ات را پیدا کن</p>
-        </div>
+    <div class="advantage">
+      <div>👗</div>
+      <span>
+        <b>مد روز</b>
+        مدل‌های جدید
+      </span>
+    </div>
 
+    <div class="advantage">
+      <div>💗</div>
+      <span>
+        <b>انتخاب خاص</b>
+        برای استایل تو
+      </span>
+    </div>
 
-        <div class="category-list">
+    <div class="advantage">
+      <div>✨</div>
+      <span>
+        <b>کیفیت خوب</b>
+        انتخاب مطمئن
+      </span>
+    </div>
 
-            <button class="category active" data-category="همه">
-                همه
-            </button>
+    <div class="advantage">
+      <div>🛍️</div>
+      <span>
+        <b>خرید آسان</b>
+        سریع و ساده
+      </span>
+    </div>
 
-            <button class="category" data-category="مانتو">
-                🧥 مانتو
-            </button>
-
-            <button class="category" data-category="شومیز">
-                👚 شومیز
-            </button>
-
-            <button class="category" data-category="لباس زنانه">
-                👗 لباس زنانه
-            </button>
-
-            <button class="category" data-category="ست زنانه">
-                🎀 ست زنانه
-            </button>
-
-            <button class="category" data-category="اکسسوری">
-                👜 اکسسوری
-            </button>
-
-        </div>
-
-
-        <div class="tools">
-
-            <input
-                id="searchInput"
-                type="text"
-                placeholder="🔍 جستجوی محصول..."
-            >
-
-            <select id="sortSelect">
-                <option value="default">مرتب‌سازی</option>
-                <option value="cheap">ارزان‌ترین</option>
-                <option value="expensive">گران‌ترین</option>
-                <option value="newest">جدیدترین</option>
-            </select>
-
-        </div>
+  </section>
 
 
-        <div id="productsGrid" class="products-grid"></div>
+  <section id="products" class="products-section container">
 
-        <div id="emptyState" class="empty hidden">
-            <div>🛍️</div>
-            <h3>محصولی پیدا نشد</h3>
-            <p>دسته‌بندی یا عبارت جستجو را تغییر بده.</p>
-        </div>
+    <div class="section-heading">
 
-    </section>
+      <span>فروشگاه الف شاپ</span>
+
+      <h2>
+        محصولات محبوب ما 💕
+      </h2>
+
+      <p>
+        محصول مورد علاقه‌ات را پیدا کن
+      </p>
+
+    </div>
+
+
+    <div class="categories">
+
+      <button class="category active" data-category="همه">
+        همه
+      </button>
+
+      <button class="category" data-category="مانتو">
+        🧥 مانتو
+      </button>
+
+      <button class="category" data-category="شومیز">
+        👚 شومیز
+      </button>
+
+      <button class="category" data-category="لباس زنانه">
+        👗 لباس زنانه
+      </button>
+
+      <button class="category" data-category="ست زنانه">
+        🎀 ست زنانه
+      </button>
+
+      <button class="category" data-category="اکسسوری">
+        👜 اکسسوری
+      </button>
+
+    </div>
+
+
+    <div class="search-area">
+
+      <input
+        id="searchInput"
+        type="text"
+        placeholder="🔎 جستجوی محصول..."
+      >
+
+      <select id="sortSelect">
+
+        <option value="default">
+          مرتب‌سازی
+        </option>
+
+        <option value="cheap">
+          ارزان‌ترین
+        </option>
+
+        <option value="expensive">
+          گران‌ترین
+        </option>
+
+        <option value="newest">
+          جدیدترین
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div id="productsGrid" class="products-grid"></div>
+
+    <div id="emptyProducts" class="empty-products hidden">
+
+      <div>🛍️</div>
+
+      <h3>
+        محصولی پیدا نشد
+      </h3>
+
+      <p>
+        جستجو یا دسته‌بندی را تغییر بده.
+      </p>
+
+    </div>
+
+  </section>
 
 </main>
 
@@ -163,33 +223,59 @@
 
 <div id="overlay" class="overlay"></div>
 
-<aside id="cartPanel" class="cart-panel">
+<aside id="cartPanel" class="side-panel">
 
-    <div class="panel-head">
-        <h2>🛒 سبد خرید</h2>
-        <button id="closeCart">×</button>
+  <div class="panel-header">
+
+    <div>
+      <strong>🛒 سبد خرید</strong>
+      <small>محصولات انتخابی تو</small>
     </div>
 
-    <div id="cartItems" class="cart-items"></div>
+    <button id="closeCart" class="close-button">
+      ×
+    </button>
 
-    <div id="cartEmpty" class="cart-empty">
-        <div>🛒</div>
-        <b>سبد خرید خالی است</b>
-        <small>محصولی به سبد اضافه کن.</small>
+  </div>
+
+
+  <div id="cartItems" class="cart-items"></div>
+
+
+  <div id="emptyCart" class="empty-cart">
+
+    <div>🛒</div>
+
+    <strong>
+      سبد خرید خالیه
+    </strong>
+
+    <small>
+      هنوز محصولی انتخاب نکردی.
+    </small>
+
+  </div>
+
+
+  <div class="cart-footer">
+
+    <div class="total-row">
+
+      <span>
+        مجموع
+      </span>
+
+      <strong id="cartTotal">
+        ۰ تومان
+      </strong>
+
     </div>
 
-    <div class="cart-bottom">
+    <button id="checkoutButton" class="primary-button full">
+      ثبت سفارش
+    </button>
 
-        <div>
-            <span>مجموع</span>
-            <b id="cartTotal">۰ تومان</b>
-        </div>
-
-        <button id="checkoutBtn">
-            ثبت سفارش
-        </button>
-
-    </div>
+  </div>
 
 </aside>
 
@@ -198,119 +284,188 @@
 
 <div id="adminModal" class="modal">
 
-    <div class="admin-box">
+  <div class="admin-window">
 
-        <button id="closeAdmin" class="close-modal">×</button>
-
-
-        <div id="loginBox">
-
-            <div class="admin-symbol">🔐</div>
-
-            <h2>پنل مدیریت</h2>
-
-            <p>رمز مدیریت را وارد کن</p>
-
-            <input
-                id="adminPassword"
-                type="password"
-                placeholder="رمز عبور"
-            >
-
-            <button id="loginBtn" class="main-btn">
-                ورود
-            </button>
-
-            <p id="loginError" class="login-error">
-                رمز اشتباه است.
-            </p>
-
-        </div>
+    <button id="closeAdmin" class="close-button modal-close">
+      ×
+    </button>
 
 
-        <div id="adminPanel" class="hidden">
+    <!-- LOGIN -->
 
-            <div class="admin-head">
-                <div>
-                    <b>⚙️ مدیریت الف شاپ</b>
-                    <small>افزودن و حذف محصولات</small>
-                </div>
+    <div id="adminLogin" class="admin-login">
 
-                <button id="logoutBtn">
-                    خروج
-                </button>
-            </div>
+      <div class="lock-icon">
+        🔐
+      </div>
 
+      <h2>
+        پنل مدیریت
+      </h2>
 
-            <div class="admin-card">
+      <p>
+        برای ورود رمز مدیریت را وارد کن
+      </p>
 
-                <h3>➕ محصول جدید</h3>
+      <input
+        id="adminPassword"
+        type="password"
+        placeholder="رمز مدیریت"
+      >
 
-                <label>نام محصول</label>
-                <input id="pName" placeholder="مثلاً شومیز سفید">
+      <button id="loginButton" class="primary-button full">
+        ورود به پنل
+      </button>
 
-
-                <div class="two">
-
-                    <div>
-                        <label>قیمت</label>
-                        <input id="pPrice" type="number" placeholder="890000">
-                    </div>
-
-                    <div>
-                        <label>دسته‌بندی</label>
-
-                        <select id="pCategory">
-
-                            <option value="مانتو">مانتو</option>
-                            <option value="شومیز">شومیز</option>
-                            <option value="لباس زنانه">لباس زنانه</option>
-                            <option value="ست زنانه">ست زنانه</option>
-                            <option value="اکسسوری">اکسسوری</option>
-
-                        </select>
-                    </div>
-
-                </div>
-
-
-                <label>آدرس عکس</label>
-
-                <input
-                    id="pImage"
-                    placeholder="assets/product1.jpg"
-                >
-
-
-                <label>توضیحات</label>
-
-                <textarea
-                    id="pDescription"
-                    placeholder="توضیحات محصول"
-                ></textarea>
-
-
-                <button id="addProductBtn" class="main-btn">
-                    افزودن محصول
-                </button>
-
-            </div>
-
-
-            <div class="admin-card">
-
-                <div class="admin-products-title">
-                    <h3>📦 محصولات</h3>
-                    <span id="adminCount">0</span>
-                </div>
-
-                <div id="adminProducts"></div>
-
-            </div>
-
-        </div>
+      <div id="loginError" class="login-error">
+        رمز وارد شده اشتباه است.
+      </div>
 
     </div>
+
+
+    <!-- PANEL -->
+
+    <div id="adminDashboard" class="hidden">
+
+      <div class="dashboard-header">
+
+        <div>
+          <span>
+            مدیریت فروشگاه
+          </span>
+
+          <h2>
+            الف شاپ ⚙️
+          </h2>
+        </div>
+
+        <button id="logoutButton">
+          خروج
+        </button>
+
+      </div>
+
+
+      <div class="admin-box">
+
+        <h3>
+          ➕ افزودن محصول جدید
+        </h3>
+
+
+        <label>
+          نام محصول
+        </label>
+
+        <input
+          id="productName"
+          type="text"
+          placeholder="مثلاً شومیز سفید زنانه"
+        >
+
+
+        <div class="form-grid">
+
+          <div>
+
+            <label>
+              قیمت
+            </label>
+
+            <input
+              id="productPrice"
+              type="number"
+              placeholder="890000"
+            >
+
+          </div>
+
+
+          <div>
+
+            <label>
+              دسته‌بندی
+            </label>
+
+            <select id="productCategory">
+
+              <option value="مانتو">
+                مانتو
+              </option>
+
+              <option value="شومیز">
+                شومیز
+              </option>
+
+              <option value="لباس زنانه">
+                لباس زنانه
+              </option>
+
+              <option value="ست زنانه">
+                ست زنانه
+              </option>
+
+              <option value="اکسسوری">
+                اکسسوری
+              </option>
+
+            </select>
+
+          </div>
+
+        </div>
+
+
+        <label>
+          لینک عکس محصول
+        </label>
+
+        <input
+          id="productImage"
+          type="text"
+          placeholder="https://..."
+        >
+
+
+        <label>
+          توضیحات محصول
+        </label>
+
+        <textarea
+          id="productDescription"
+          placeholder="توضیحات محصول..."
+        ></textarea>
+
+
+        <button id="addProduct" class="primary-button full">
+          افزودن محصول
+        </button>
+
+      </div>
+
+
+      <div class="admin-box">
+
+        <div class="admin-products-title">
+
+          <h3>
+            📦 محصولات
+          </h3>
+
+          <span id="productNumber">
+            0
+          </span>
+
+        </div>
+
+        <div id="adminProducts"></div>
+
+      </div>
+
+    </div>
+
+  </div>
 
 </div>
 
@@ -319,9 +474,19 @@
 
 
 <footer>
-    <b>🛍️ الف شاپ</b>
-    <p>فروشگاه آنلاین پوشاک زنانه</p>
-    <small>© ۱۴۰۵ الف شاپ</small>
+
+  <div class="footer-logo">
+    🛍️ الف شاپ
+  </div>
+
+  <p>
+    فروشگاه آنلاین پوشاک زنانه
+  </p>
+
+  <small>
+    © ۱۴۰۵ الف شاپ
+  </small>
+
 </footer>
 
 

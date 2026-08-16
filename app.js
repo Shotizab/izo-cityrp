@@ -1,29 +1,30 @@
-"use strict";
+/* =====================================================
+   الف شاپ
+   فروشگاه آنلاین لباس زنانه
+   ===================================================== */
 
 
-/* ================================
-   تنظیمات اصلی
-================================ */
+/* ================= SETTINGS ================= */
 
 const ADMIN_PASSWORD = "fal";
 
-const STORAGE_KEY = "alf_shop_products_v1";
-const CART_KEY = "alf_shop_cart_v1";
+const PRODUCTS_KEY = "alf_shop_products_v2";
+
+const CART_KEY = "alf_shop_cart_v2";
 
 
-/* ================================
-   محصولات پیش‌فرض
-================================ */
+/* ================= DEFAULT PRODUCTS ================= */
 
-const DEFAULT_PRODUCTS = [
+const defaultProducts = [
 
     {
         id: 1,
         name: "شومیز سفید زنانه",
         category: "شومیز",
         price: 890000,
-        image: "assets/banner.jpg",
-        desc: "شومیز زنانه شیک و مناسب استفاده روزمره."
+        image: "assets/product1.jpg",
+        description:
+            "شومیز سفید زنانه با طراحی ساده و شیک."
     },
 
     {
@@ -31,322 +32,175 @@ const DEFAULT_PRODUCTS = [
         name: "مانتو زنانه",
         category: "مانتو",
         price: 1290000,
-        image: "assets/banner.jpg",
-        desc: "مانتو زنانه با طراحی شیک و مناسب استایل روزانه."
+        image: "assets/product2.jpg",
+        description:
+            "مانتو زنانه مناسب استایل روزمره."
     },
 
     {
         id: 3,
         name: "ست زنانه",
-        category: "ست",
+        category: "ست زنانه",
         price: 1490000,
-        image: "assets/banner.jpg",
-        desc: "ست زنانه شیک و راحت برای استفاده روزمره."
+        image: "assets/product3.jpg",
+        description:
+            "ست زنانه شیک و راحت برای استفاده روزمره."
+    },
+
+    {
+        id: 4,
+        name: "لباس زنانه",
+        category: "لباس زنانه",
+        price: 1190000,
+        image: "assets/product4.jpg",
+        description:
+            "لباس زنانه با طراحی جدید و جذاب."
+    },
+
+    {
+        id: 5,
+        name: "کیف زنانه",
+        category: "اکسسوری",
+        price: 790000,
+        image: "assets/product5.jpg",
+        description:
+            "کیف زنانه شیک برای تکمیل استایل."
+    },
+
+    {
+        id: 6,
+        name: "ست تابستانی",
+        category: "ست زنانه",
+        price: 1390000,
+        image: "assets/product6.jpg",
+        description:
+            "ست تابستانی سبک و راحت."
     }
 
 ];
 
 
-/* ================================
-   گرفتن اطلاعات از LocalStorage
-================================ */
+/* ================= LOAD DATA ================= */
 
-function loadProducts() {
+let products =
+    JSON.parse(
+        localStorage.getItem(PRODUCTS_KEY)
+    ) || defaultProducts;
 
-    try {
 
-        const saved = localStorage.getItem(STORAGE_KEY);
+let cart =
+    JSON.parse(
+        localStorage.getItem(CART_KEY)
+    ) || [];
 
-        if (saved) {
-            return JSON.parse(saved);
-        }
 
-    } catch (error) {
+/* ================= ELEMENTS ================= */
 
-        console.error("خطا در خواندن محصولات:", error);
+const productGrid =
+    document.getElementById("productGrid");
 
-    }
+const emptyProducts =
+    document.getElementById("emptyProducts");
 
-    return DEFAULT_PRODUCTS;
+const searchInput =
+    document.getElementById("searchInput");
 
-}
+const sortProducts =
+    document.getElementById("sortProducts");
 
+const categories =
+    document.querySelectorAll(".category");
+
+const cartButton =
+    document.getElementById("cartButton");
+
+const cartPanel =
+    document.getElementById("cartPanel");
+
+const overlay =
+    document.getElementById("overlay");
+
+const closeCart =
+    document.getElementById("closeCart");
+
+const cartItems =
+    document.getElementById("cartItems");
+
+const cartEmpty =
+    document.getElementById("cartEmpty");
+
+const cartTotal =
+    document.getElementById("cartTotal");
+
+const cartCount =
+    document.getElementById("cartCount");
+
+const checkoutButton =
+    document.getElementById("checkoutButton");
+
+const adminButton =
+    document.getElementById("adminButton");
+
+const adminModal =
+    document.getElementById("adminModal");
+
+const closeAdmin =
+    document.getElementById("closeAdmin");
+
+const adminPassword =
+    document.getElementById("adminPassword");
+
+const loginAdmin =
+    document.getElementById("loginAdmin");
+
+const loginError =
+    document.getElementById("loginError");
+
+const adminLogin =
+    document.getElementById("adminLogin");
+
+const adminPanel =
+    document.getElementById("adminPanel");
+
+const logoutAdmin =
+    document.getElementById("logoutAdmin");
+
+const productName =
+    document.getElementById("productName");
+
+const productPrice =
+    document.getElementById("productPrice");
+
+const productCategory =
+    document.getElementById("productCategory");
+
+const productImage =
+    document.getElementById("productImage");
+
+const productDescription =
+    document.getElementById("productDescription");
+
+const addProductButton =
+    document.getElementById("addProduct");
+
+const adminProductList =
+    document.getElementById("adminProductList");
+
+const adminProductCount =
+    document.getElementById("adminProductCount");
+
+const toast =
+    document.getElementById("toast");
+
+
+/* ================= SAVE ================= */
 
 function saveProducts() {
 
     localStorage.setItem(
-        STORAGE_KEY,
+        PRODUCTS_KEY,
         JSON.stringify(products)
     );
-
-}
-
-
-/* ================================
-   متغیرها
-================================ */
-
-let products = loadProducts();
-
-let cart = loadCart();
-
-let selectedCategory = "همه";
-
-
-/* ================================
-   ابزارهای عمومی
-================================ */
-
-function formatPrice(price) {
-
-    return Number(price).toLocaleString("fa-IR") + " تومان";
-
-}
-
-
-function escapeHtml(text) {
-
-    return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-}
-
-
-function showToast(message) {
-
-    const toast = document.getElementById("toast");
-
-    toast.textContent = message;
-
-    toast.classList.add("show");
-
-    setTimeout(() => {
-
-        toast.classList.remove("show");
-
-    }, 2500);
-
-}
-
-
-function openModal(id) {
-
-    const modal = document.getElementById(id);
-
-    if (modal) {
-        modal.classList.add("show");
-    }
-
-}
-
-
-function closeModal(id) {
-
-    const modal = document.getElementById(id);
-
-    if (modal) {
-        modal.classList.remove("show");
-    }
-
-}
-
-
-/* ================================
-   نمایش محصولات
-================================ */
-
-function renderProducts() {
-
-    const grid = document.getElementById("productGrid");
-    const empty = document.getElementById("emptyProducts");
-
-    const searchInput = document.getElementById("searchInput");
-
-    const query = searchInput
-        ? searchInput.value.trim().toLowerCase()
-        : "";
-
-    const categorySelect =
-        document.getElementById("categoryFilter");
-
-    const category =
-        categorySelect
-            ? categorySelect.value
-            : selectedCategory;
-
-
-    const filtered = products.filter(product => {
-
-        const matchesSearch =
-            product.name.toLowerCase().includes(query) ||
-            product.desc.toLowerCase().includes(query);
-
-        const matchesCategory =
-            category === "همه" ||
-            product.category === category;
-
-        return matchesSearch && matchesCategory;
-
-    });
-
-
-    if (filtered.length === 0) {
-
-        grid.innerHTML = "";
-
-        empty.style.display = "block";
-
-        return;
-
-    }
-
-
-    empty.style.display = "none";
-
-
-    grid.innerHTML = filtered.map(product => {
-
-        return `
-
-            <article class="product-card">
-
-                <img
-                    class="product-image"
-                    src="${escapeHtml(product.image)}"
-                    alt="${escapeHtml(product.name)}"
-                    onerror="this.src='assets/banner.jpg'"
-                >
-
-                <div class="product-body">
-
-                    <div class="product-category">
-                        ${escapeHtml(product.category)}
-                    </div>
-
-                    <h3 class="product-title">
-                        ${escapeHtml(product.name)}
-                    </h3>
-
-                    <p class="product-description">
-                        ${escapeHtml(product.desc)}
-                    </p>
-
-                    <div class="product-price">
-                        ${formatPrice(product.price)}
-                    </div>
-
-                    <div class="product-buttons">
-
-                        <button
-                            onclick="showProduct(${product.id})"
-                        >
-                            مشاهده
-                        </button>
-
-                        <button
-                            class="buy"
-                            onclick="addToCart(${product.id})"
-                        >
-                            🛒 افزودن
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </article>
-
-        `;
-
-    }).join("");
-
-}
-
-
-/* ================================
-   نمایش محصول
-================================ */
-
-function showProduct(id) {
-
-    const product = products.find(
-        p => p.id === id
-    );
-
-    if (!product) {
-        return;
-    }
-
-
-    const detail =
-        document.getElementById("productDetail");
-
-
-    detail.innerHTML = `
-
-        <h2>${escapeHtml(product.name)}</h2>
-
-        <img
-            class="detail-image"
-            src="${escapeHtml(product.image)}"
-            alt="${escapeHtml(product.name)}"
-            onerror="this.src='assets/banner.jpg'"
-        >
-
-        <div class="product-category">
-            ${escapeHtml(product.category)}
-        </div>
-
-        <div class="detail-price">
-            ${formatPrice(product.price)}
-        </div>
-
-        <p class="detail-description">
-            ${escapeHtml(product.desc)}
-        </p>
-
-        <br>
-
-        <button
-            class="primary-button"
-            onclick="addToCart(${product.id}); closeModal('productModal')"
-        >
-            🛒 افزودن به سبد خرید
-        </button>
-
-    `;
-
-
-    openModal("productModal");
-
-}
-
-
-/* ================================
-   سبد خرید
-================================ */
-
-function loadCart() {
-
-    try {
-
-        const saved = localStorage.getItem(CART_KEY);
-
-        if (saved) {
-            return JSON.parse(saved);
-        }
-
-    } catch (error) {
-
-        console.error(error);
-
-    }
-
-    return [];
 
 }
 
@@ -361,281 +215,722 @@ function saveCart() {
 }
 
 
-function addToCart(id) {
+/* ================= FORMAT PRICE ================= */
 
-    const product = products.find(
-        p => p.id === id
-    );
+function formatPrice(number) {
 
-    if (!product) {
-        return;
-    }
-
-
-    cart.push(id);
-
-    saveCart();
-
-    updateCartCount();
-
-    showToast("محصول به سبد خرید اضافه شد 🛒");
+    return new Intl.NumberFormat("fa-IR")
+        .format(number) + " تومان";
 
 }
 
 
-function removeFromCart(index) {
+/* ================= ESCAPE HTML ================= */
 
-    cart.splice(index, 1);
+function escapeHtml(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = text ?? "";
+
+    return div.innerHTML;
+
+}
+
+
+/* ================= PRODUCT IMAGE ================= */
+
+function productImageHtml(product) {
+
+    const safeImage =
+        escapeHtml(product.image || "");
+
+    const safeName =
+        escapeHtml(product.name);
+
+    return `
+        <img
+            src="${safeImage}"
+            alt="${safeName}"
+            onerror="
+                this.style.display='none';
+                this.parentElement.classList.add('image-error');
+            "
+        >
+    `;
+
+}
+
+
+/* ================= RENDER PRODUCTS ================= */
+
+function renderProducts() {
+
+    const search =
+        searchInput.value
+            .trim()
+            .toLowerCase();
+
+    const selectedCategory =
+        document.querySelector(
+            ".category.active"
+        )?.dataset.category || "همه";
+
+
+    let list =
+        products.filter(product => {
+
+            const matchesSearch =
+                product.name
+                    .toLowerCase()
+                    .includes(search) ||
+
+                product.description
+                    .toLowerCase()
+                    .includes(search);
+
+
+            const matchesCategory =
+                selectedCategory === "همه" ||
+                product.category === selectedCategory;
+
+
+            return matchesSearch &&
+                   matchesCategory;
+
+        });
+
+
+    /* ================= SORT ================= */
+
+    const sort =
+        sortProducts.value;
+
+
+    if (sort === "cheap") {
+
+        list.sort(
+            (a, b) => a.price - b.price
+        );
+
+    }
+
+
+    if (sort === "expensive") {
+
+        list.sort(
+            (a, b) => b.price - a.price
+        );
+
+    }
+
+
+    if (sort === "newest") {
+
+        list.sort(
+            (a, b) => b.id - a.id
+        );
+
+    }
+
+
+    /* ================= EMPTY ================= */
+
+    if (list.length === 0) {
+
+        productGrid.innerHTML = "";
+
+        emptyProducts.style.display =
+            "block";
+
+        return;
+
+    }
+
+
+    emptyProducts.style.display =
+        "none";
+
+
+    /* ================= CARDS ================= */
+
+    productGrid.innerHTML =
+        list.map(product => {
+
+            return `
+
+                <article class="product-card">
+
+                    <div class="product-image">
+
+                        ${productImageHtml(product)}
+
+                        <span class="product-category">
+                            ${escapeHtml(product.category)}
+                        </span>
+
+                    </div>
+
+
+                    <div class="product-body">
+
+                        <h3>
+                            ${escapeHtml(product.name)}
+                        </h3>
+
+
+                        <p class="product-description">
+                            ${escapeHtml(product.description)}
+                        </p>
+
+
+                        <div class="product-bottom">
+
+                            <strong class="product-price">
+                                ${formatPrice(product.price)}
+                            </strong>
+
+
+                            <button
+                                class="add-cart"
+                                data-add="${product.id}"
+                            >
+                                🛒 افزودن
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            `;
+
+        }).join("");
+
+
+    document
+        .querySelectorAll("[data-add]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    const id =
+                        Number(button.dataset.add);
+
+                    addToCart(id);
+
+                }
+            );
+
+        });
+
+}
+
+
+/* ================= CATEGORY ================= */
+
+categories.forEach(category => {
+
+    category.addEventListener(
+        "click",
+        () => {
+
+            categories.forEach(item => {
+
+                item.classList.remove("active");
+
+            });
+
+
+            category.classList.add("active");
+
+            renderProducts();
+
+        }
+    );
+
+});
+
+
+/* ================= SEARCH ================= */
+
+searchInput.addEventListener(
+    "input",
+    renderProducts
+);
+
+
+/* ================= SORT ================= */
+
+sortProducts.addEventListener(
+    "change",
+    renderProducts
+);
+
+
+/* ================= CART ================= */
+
+function addToCart(productId) {
+
+    const product =
+        products.find(
+            p => p.id === productId
+        );
+
+
+    if (!product) return;
+
+
+    const existing =
+        cart.find(
+            item => item.id === productId
+        );
+
+
+    if (existing) {
+
+        existing.quantity++;
+
+    } else {
+
+        cart.push({
+
+            id: productId,
+
+            quantity: 1
+
+        });
+
+    }
+
 
     saveCart();
 
     renderCart();
 
-    updateCartCount();
+    showToast(
+        "محصول به سبد خرید اضافه شد 💗"
+    );
+
+    openCart();
 
 }
 
 
-function updateCartCount() {
-
-    document.getElementById("cartCount").textContent =
-        cart.length.toLocaleString("fa-IR");
-
-}
-
+/* ================= RENDER CART ================= */
 
 function renderCart() {
 
-    const container =
-        document.getElementById("cartItems");
-
-    const totalElement =
-        document.getElementById("cartTotal");
-
-
     if (cart.length === 0) {
 
-        container.innerHTML = `
-            <div class="empty-products">
-                <div>🛒</div>
-                <h3>سبد خرید خالی است</h3>
-                <p>محصولات مورد علاقه‌ات را اضافه کن.</p>
-            </div>
-        `;
+        cartItems.innerHTML = "";
 
-        totalElement.textContent = "0 تومان";
+        cartEmpty.style.display =
+            "flex";
+
+        cartCount.textContent = "0";
+
+        cartTotal.textContent =
+            "۰ تومان";
 
         return;
 
     }
+
+
+    cartEmpty.style.display =
+        "none";
 
 
     let total = 0;
 
-
-    container.innerHTML = cart.map((id, index) => {
-
-        const product =
-            products.find(p => p.id === id);
+    let count = 0;
 
 
-        if (!product) {
-            return "";
-        }
+    cartItems.innerHTML =
+        cart.map(item => {
+
+            const product =
+                products.find(
+                    p => p.id === item.id
+                );
 
 
-        total += Number(product.price);
+            if (!product) return "";
 
 
-        return `
-
-            <div class="cart-item">
-
-                <img
-                    src="${escapeHtml(product.image)}"
-                    alt="${escapeHtml(product.name)}"
-                    onerror="this.src='assets/banner.jpg'"
-                >
-
-                <div class="cart-item-info">
-
-                    <strong>
-                        ${escapeHtml(product.name)}
-                    </strong>
-
-                    <span>
-                        ${formatPrice(product.price)}
-                    </span>
-
-                </div>
-
-                <button
-                    class="remove-cart"
-                    onclick="removeFromCart(${index})"
-                >
-                    حذف
-                </button>
-
-            </div>
-
-        `;
-
-    }).join("");
+            total +=
+                product.price *
+                item.quantity;
 
 
-    totalElement.textContent =
-        formatPrice(total);
-
-}
+            count +=
+                item.quantity;
 
 
-/* ================================
-   پنل مدیریت
-================================ */
+            return `
 
-function openAdmin() {
-
-    document.getElementById("adminPassword").value = "";
-
-    document.getElementById("loginError").textContent = "";
-
-    openModal("loginModal");
-
-}
-
-
-function loginAdmin() {
-
-    const password =
-        document.getElementById("adminPassword").value;
-
-    const error =
-        document.getElementById("loginError");
-
-
-    if (password === ADMIN_PASSWORD) {
-
-        closeModal("loginModal");
-
-        renderAdminProducts();
-
-        openModal("adminModal");
-
-        showToast("ورود به پنل مدیریت موفق بود");
-
-    } else {
-
-        error.textContent =
-            "رمز مدیریت اشتباه است.";
-
-    }
-
-}
-
-
-function logoutAdmin() {
-
-    closeModal("adminModal");
-
-    showToast("از پنل مدیریت خارج شدید");
-
-}
-
-
-/* ================================
-   نمایش محصولات در مدیریت
-================================ */
-
-function renderAdminProducts() {
-
-    const container =
-        document.getElementById("adminProducts");
-
-
-    if (products.length === 0) {
-
-        container.innerHTML = `
-            <p>محصولی وجود ندارد.</p>
-        `;
-
-        return;
-
-    }
-
-
-    container.innerHTML = products.map(product => {
-
-        return `
-
-            <div class="admin-product">
-
-                <div class="admin-product-info">
+                <div class="cart-item">
 
                     <img
-                        class="admin-product-image"
+                        class="cart-item-image"
                         src="${escapeHtml(product.image)}"
-                        alt=""
-                        onerror="this.src='assets/banner.jpg'"
+                        alt="${escapeHtml(product.name)}"
                     >
 
-                    <div>
 
-                        <strong>
+                    <div class="cart-item-info">
+
+                        <h4>
                             ${escapeHtml(product.name)}
-                        </strong>
+                        </h4>
 
-                        <div>
+                        <div class="cart-item-price">
                             ${formatPrice(product.price)}
+                        </div>
+
+
+                        <div class="cart-item-controls">
+
+                            <button
+                                class="qty-button"
+                                data-minus="${product.id}"
+                            >
+                                −
+                            </button>
+
+                            <span>
+                                ${item.quantity}
+                            </span>
+
+                            <button
+                                class="qty-button"
+                                data-plus="${product.id}"
+                            >
+                                +
+                            </button>
+
+                            <button
+                                class="remove-item"
+                                data-remove="${product.id}"
+                            >
+                                حذف
+                            </button>
+
                         </div>
 
                     </div>
 
                 </div>
 
-                <button
-                    class="delete-product"
-                    onclick="deleteProduct(${product.id})"
-                >
-                    🗑️ حذف
-                </button>
+            `;
 
-            </div>
+        }).join("");
 
-        `;
 
-    }).join("");
+    cartCount.textContent =
+        count;
+
+
+    cartTotal.textContent =
+        formatPrice(total);
+
+
+    document
+        .querySelectorAll("[data-plus]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    changeQuantity(
+                        Number(button.dataset.plus),
+                        1
+                    );
+
+                }
+            );
+
+        });
+
+
+    document
+        .querySelectorAll("[data-minus]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    changeQuantity(
+                        Number(button.dataset.minus),
+                        -1
+                    );
+
+                }
+            );
+
+        });
+
+
+    document
+        .querySelectorAll("[data-remove]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    removeFromCart(
+                        Number(button.dataset.remove)
+                    );
+
+                }
+            );
+
+        });
 
 }
 
 
-/* ================================
-   افزودن محصول
-================================ */
+/* ================= QUANTITY ================= */
 
-function addProduct(event) {
+function changeQuantity(
+    productId,
+    amount
+) {
 
-    event.preventDefault();
+    const item =
+        cart.find(
+            item => item.id === productId
+        );
 
+
+    if (!item) return;
+
+
+    item.quantity += amount;
+
+
+    if (item.quantity <= 0) {
+
+        cart =
+            cart.filter(
+                item => item.id !== productId
+            );
+
+    }
+
+
+    saveCart();
+
+    renderCart();
+
+}
+
+
+/* ================= REMOVE CART ================= */
+
+function removeFromCart(productId) {
+
+    cart =
+        cart.filter(
+            item => item.id !== productId
+        );
+
+
+    saveCart();
+
+    renderCart();
+
+}
+
+
+/* ================= OPEN CART ================= */
+
+function openCart() {
+
+    cartPanel.classList.add("active");
+
+    overlay.classList.add("active");
+
+}
+
+
+function closeCartPanel() {
+
+    cartPanel.classList.remove("active");
+
+    overlay.classList.remove("active");
+
+}
+
+
+cartButton.addEventListener(
+    "click",
+    openCart
+);
+
+
+closeCart.addEventListener(
+    "click",
+    closeCartPanel
+);
+
+
+overlay.addEventListener(
+    "click",
+    closeCartPanel
+);
+
+
+/* ================= ADMIN ================= */
+
+adminButton.addEventListener(
+    "click",
+    () => {
+
+        adminModal.classList.add("active");
+
+        adminPassword.focus();
+
+    }
+);
+
+
+closeAdmin.addEventListener(
+    "click",
+    () => {
+
+        adminModal.classList.remove(
+            "active"
+        );
+
+    }
+);
+
+
+/* ================= LOGIN ================= */
+
+function login() {
+
+    if (
+        adminPassword.value ===
+        ADMIN_PASSWORD
+    ) {
+
+        adminLogin.classList.add(
+            "hidden"
+        );
+
+        adminPanel.classList.remove(
+            "hidden"
+        );
+
+        loginError.style.display =
+            "none";
+
+        adminPassword.value = "";
+
+        renderAdminProducts();
+
+    } else {
+
+        loginError.style.display =
+            "block";
+
+    }
+
+}
+
+
+loginAdmin.addEventListener(
+    "click",
+    login
+);
+
+
+adminPassword.addEventListener(
+    "keydown",
+    event => {
+
+        if (event.key === "Enter") {
+
+            login();
+
+        }
+
+    }
+);
+
+
+/* ================= LOGOUT ================= */
+
+logoutAdmin.addEventListener(
+    "click",
+    () => {
+
+        adminPanel.classList.add(
+            "hidden"
+        );
+
+        adminLogin.classList.remove(
+            "hidden"
+        );
+
+    }
+);
+
+
+/* ================= ADD PRODUCT ================= */
+
+addProductButton.addEventListener(
+    "click",
+    addProduct
+);
+
+
+function addProduct() {
 
     const name =
-        document.getElementById("productName").value.trim();
+        productName.value.trim();
 
     const price =
-        Number(document.getElementById("productPrice").value);
+        Number(productPrice.value);
 
     const category =
-        document.getElementById("productCategory").value;
+        productCategory.value;
 
     const image =
-        document.getElementById("productImage").value.trim();
+        productImage.value.trim() ||
+        "assets/product1.jpg";
 
-    const desc =
-        document.getElementById("productDescription").value.trim();
+    const description =
+        productDescription.value.trim() ||
+        "محصول شیک و جدید الف شاپ";
 
 
-    if (!name || !price) {
+    if (!name) {
 
-        showToast("نام و قیمت محصول را وارد کنید.");
+        alert(
+            "لطفاً نام محصول را وارد کن."
+        );
+
+        return;
+
+    }
+
+
+    if (!price || price <= 0) {
+
+        alert(
+            "لطفاً قیمت محصول را وارد کن."
+        );
 
         return;
 
@@ -644,22 +939,26 @@ function addProduct(event) {
 
     const newProduct = {
 
-        id: Date.now(),
+        id:
+            Date.now(),
 
-        name: name,
+        name,
 
-        price: price,
+        category,
 
-        category: category,
+        price,
 
-        image: image || "assets/banner.jpg",
+        image,
 
-        desc: desc || "محصول جدید الف شاپ"
+        description
 
     };
 
 
-    products.unshift(newProduct);
+    products.unshift(
+        newProduct
+    );
+
 
     saveProducts();
 
@@ -668,271 +967,219 @@ function addProduct(event) {
     renderAdminProducts();
 
 
-    document.getElementById("productForm").reset();
+    productName.value = "";
+
+    productPrice.value = "";
+
+    productImage.value = "";
+
+    productDescription.value = "";
 
 
-    showToast("محصول با موفقیت اضافه شد ✅");
+    showToast(
+        "محصول جدید اضافه شد ✅"
+    );
 
 }
 
 
-/* ================================
-   حذف محصول
-================================ */
+/* ================= ADMIN PRODUCTS ================= */
 
-function deleteProduct(id) {
+function renderAdminProducts() {
 
-    const product =
-        products.find(p => p.id === id);
+    adminProductCount.textContent =
+        `${products.length} محصول`;
 
 
-    if (!product) {
+    if (products.length === 0) {
+
+        adminProductList.innerHTML = `
+            <p>
+                هنوز محصولی وجود ندارد.
+            </p>
+        `;
+
         return;
+
     }
 
 
-    const answer =
-        confirm(
-            `آیا از حذف «${product.name}» مطمئن هستید؟`
+    adminProductList.innerHTML =
+        products.map(product => {
+
+            return `
+
+                <div class="admin-product">
+
+                    <img
+                        src="${escapeHtml(product.image)}"
+                        alt="${escapeHtml(product.name)}"
+                    >
+
+
+                    <div class="admin-product-info">
+
+                        <strong>
+                            ${escapeHtml(product.name)}
+                        </strong>
+
+                        <span>
+                            ${formatPrice(product.price)}
+                        </span>
+
+                    </div>
+
+
+                    <button
+                        class="delete-product"
+                        data-delete="${product.id}"
+                    >
+                        🗑️ حذف
+                    </button>
+
+                </div>
+
+            `;
+
+        }).join("");
+
+
+    document
+        .querySelectorAll("[data-delete]")
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    deleteProduct(
+                        Number(
+                            button.dataset.delete
+                        )
+                    );
+
+                }
+            );
+
+        });
+
+}
+
+
+/* ================= DELETE PRODUCT ================= */
+
+function deleteProduct(productId) {
+
+    const product =
+        products.find(
+            p => p.id === productId
         );
 
 
-    if (!answer) {
-        return;
-    }
+    if (!product) return;
+
+
+    const confirmed =
+        confirm(
+            `محصول «${product.name}» حذف شود؟`
+        );
+
+
+    if (!confirmed) return;
 
 
     products =
-        products.filter(p => p.id !== id);
+        products.filter(
+            p => p.id !== productId
+        );
+
+
+    cart =
+        cart.filter(
+            item => item.id !== productId
+        );
 
 
     saveProducts();
 
+    saveCart();
+
     renderProducts();
+
+    renderCart();
 
     renderAdminProducts();
 
-    showToast("محصول حذف شد 🗑️");
+
+    showToast(
+        "محصول حذف شد 🗑️"
+    );
 
 }
 
 
-/* ================================
-   دسته‌بندی‌ها
-================================ */
+/* ================= CHECKOUT ================= */
 
-function setCategory(category) {
+checkoutButton.addEventListener(
+    "click",
+    () => {
 
-    selectedCategory = category;
-
-
-    const select =
-        document.getElementById("categoryFilter");
-
-
-    select.value = category;
-
-
-    renderProducts();
-
-
-    document
-        .getElementById("products")
-        .scrollIntoView({
-            behavior: "smooth"
-        });
-
-}
-
-
-/* ================================
-   رویدادها
-================================ */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-
-    renderProducts();
-
-    updateCartCount();
-
-
-    /* مدیریت */
-
-    document
-        .getElementById("adminButton")
-        .addEventListener(
-            "click",
-            openAdmin
-        );
-
-
-    document
-        .getElementById("loginButton")
-        .addEventListener(
-            "click",
-            loginAdmin
-        );
-
-
-    document
-        .getElementById("logoutButton")
-        .addEventListener(
-            "click",
-            logoutAdmin
-        );
-
-
-    document
-        .getElementById("adminPassword")
-        .addEventListener("keydown", event => {
-
-            if (event.key === "Enter") {
-
-                loginAdmin();
-
-            }
-
-        });
-
-
-    /* فرم محصول */
-
-    document
-        .getElementById("productForm")
-        .addEventListener(
-            "submit",
-            addProduct
-        );
-
-
-    /* جستجو */
-
-    document
-        .getElementById("searchInput")
-        .addEventListener(
-            "input",
-            renderProducts
-        );
-
-
-    /* فیلتر */
-
-    document
-        .getElementById("categoryFilter")
-        .addEventListener(
-            "change",
-            renderProducts
-        );
-
-
-    /* دسته‌بندی */
-
-    document
-        .querySelectorAll(".category-card")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    setCategory(
-                        button.dataset.category
-                    );
-
-                }
-            );
-
-        });
-
-
-    /* سبد خرید */
-
-    document
-        .getElementById("cartButton")
-        .addEventListener("click", () => {
-
-            renderCart();
-
-            openModal("cartModal");
-
-        });
-
-
-    /* ثبت سفارش */
-
-    document
-        .getElementById("checkoutButton")
-        .addEventListener("click", () => {
-
-            if (cart.length === 0) {
-
-                showToast(
-                    "سبد خرید شما خالی است."
-                );
-
-                return;
-
-            }
-
+        if (cart.length === 0) {
 
             alert(
-                "سفارش شما ثبت شد.\n\nبرای اتصال به درگاه پرداخت و ثبت سفارش واقعی باید بک‌اند و دیتابیس به سایت اضافه شود."
+                "سبد خرید خالی است."
             );
 
-        });
+            return;
+
+        }
 
 
-    /* بستن مودال */
+        alert(
+            "سبد خرید شما آماده ثبت سفارش است 💗\n\nبرای اتصال به درگاه یا ثبت سفارش واقعی باید بخش سفارش و سرور به سایت اضافه شود."
+        );
 
-    document
-        .querySelectorAll("[data-close]")
-        .forEach(button => {
-
-            button.addEventListener(
-                "click",
-                () => {
-
-                    closeModal(
-                        button.dataset.close
-                    );
-
-                }
-            );
-
-        });
+    }
+);
 
 
-    /* کلیک بیرون مودال */
+/* ================= TOAST ================= */
 
-    document
-        .querySelectorAll(".modal")
-        .forEach(modal => {
-
-            modal.addEventListener(
-                "click",
-                event => {
-
-                    if (event.target === modal) {
-
-                        modal.classList.remove("show");
-
-                    }
-
-                }
-            );
-
-        });
-
-});
+let toastTimer;
 
 
-/* ================================
-   دسترسی توابع از HTML
-================================ */
+function showToast(message) {
 
-window.showProduct = showProduct;
-window.addToCart = addToCart;
-window.removeFromCart = removeFromCart;
-window.deleteProduct = deleteProduct;
-window.closeModal = closeModal;
+    toast.textContent =
+        message;
+
+    toast.classList.add(
+        "show"
+    );
+
+
+    clearTimeout(
+        toastTimer
+    );
+
+
+    toastTimer =
+        setTimeout(
+            () => {
+
+                toast.classList.remove(
+                    "show"
+                );
+
+            },
+            2200
+        );
+
+}
+
+
+/* ================= START ================= */
+
+renderProducts();
+
+renderCart();

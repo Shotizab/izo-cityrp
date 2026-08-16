@@ -1,118 +1,152 @@
-/* =====================================================
-   الف شاپ
-   فروشگاه آنلاین لباس زنانه
-   ===================================================== */
+"use strict";
 
-
-/* ================= SETTINGS ================= */
+/* =========================
+   SETTINGS
+========================= */
 
 const ADMIN_PASSWORD = "fal";
 
-const PRODUCTS_KEY = "alf_shop_products_v2";
+const PRODUCTS_KEY = "alf_shop_products";
+const CART_KEY = "alf_shop_cart";
 
-const CART_KEY = "alf_shop_cart_v2";
 
-
-/* ================= DEFAULT PRODUCTS ================= */
+/* =========================
+   DEFAULT PRODUCTS
+========================= */
 
 const defaultProducts = [
-
     {
         id: 1,
         name: "شومیز سفید زنانه",
         category: "شومیز",
         price: 890000,
-        image: "assets/product1.jpg",
-        description:
-            "شومیز سفید زنانه با طراحی ساده و شیک."
+        image: "",
+        description: "شومیز سفید شیک و مناسب استفاده روزمره."
     },
-
     {
         id: 2,
         name: "مانتو زنانه",
         category: "مانتو",
         price: 1290000,
-        image: "assets/product2.jpg",
-        description:
-            "مانتو زنانه مناسب استایل روزمره."
+        image: "",
+        description: "مانتو زنانه با طراحی ساده و شیک."
     },
-
     {
         id: 3,
         name: "ست زنانه",
         category: "ست زنانه",
         price: 1490000,
-        image: "assets/product3.jpg",
-        description:
-            "ست زنانه شیک و راحت برای استفاده روزمره."
+        image: "",
+        description: "ست زنانه راحت و مناسب استایل روزانه."
     },
-
     {
         id: 4,
         name: "لباس زنانه",
         category: "لباس زنانه",
         price: 1190000,
-        image: "assets/product4.jpg",
-        description:
-            "لباس زنانه با طراحی جدید و جذاب."
-    },
-
-    {
-        id: 5,
-        name: "کیف زنانه",
-        category: "اکسسوری",
-        price: 790000,
-        image: "assets/product5.jpg",
-        description:
-            "کیف زنانه شیک برای تکمیل استایل."
-    },
-
-    {
-        id: 6,
-        name: "ست تابستانی",
-        category: "ست زنانه",
-        price: 1390000,
-        image: "assets/product6.jpg",
-        description:
-            "ست تابستانی سبک و راحت."
+        image: "",
+        description: "لباس زنانه با طراحی جدید."
     }
-
 ];
 
 
-/* ================= LOAD DATA ================= */
+/* =========================
+   LOAD DATA
+========================= */
 
-let products =
-    JSON.parse(
-        localStorage.getItem(PRODUCTS_KEY)
-    ) || defaultProducts;
+function loadProducts() {
+    try {
+        const saved = localStorage.getItem(PRODUCTS_KEY);
+
+        if (!saved) {
+            return [...defaultProducts];
+        }
+
+        const parsed = JSON.parse(saved);
+
+        if (!Array.isArray(parsed)) {
+            return [...defaultProducts];
+        }
+
+        return parsed;
+
+    } catch (error) {
+        console.error("Products load error:", error);
+        return [...defaultProducts];
+    }
+}
 
 
-let cart =
-    JSON.parse(
-        localStorage.getItem(CART_KEY)
-    ) || [];
+function loadCart() {
+    try {
+        const saved = localStorage.getItem(CART_KEY);
+
+        if (!saved) {
+            return [];
+        }
+
+        const parsed = JSON.parse(saved);
+
+        return Array.isArray(parsed) ? parsed : [];
+
+    } catch (error) {
+        console.error("Cart load error:", error);
+        return [];
+    }
+}
 
 
-/* ================= ELEMENTS ================= */
+let products = loadProducts();
+let cart = loadCart();
 
-const productGrid =
-    document.getElementById("productGrid");
 
-const emptyProducts =
-    document.getElementById("emptyProducts");
+/* =========================
+   SAVE
+========================= */
+
+function saveProducts() {
+    localStorage.setItem(
+        PRODUCTS_KEY,
+        JSON.stringify(products)
+    );
+}
+
+
+function saveCart() {
+    localStorage.setItem(
+        CART_KEY,
+        JSON.stringify(cart)
+    );
+}
+
+
+/* =========================
+   DOM
+========================= */
+
+const productsGrid =
+    document.getElementById("productsGrid");
+
+const emptyState =
+    document.getElementById("emptyState");
 
 const searchInput =
     document.getElementById("searchInput");
 
-const sortProducts =
-    document.getElementById("sortProducts");
+const sortSelect =
+    document.getElementById("sortSelect");
 
-const categories =
+const categoryButtons =
     document.querySelectorAll(".category");
 
-const cartButton =
-    document.getElementById("cartButton");
+const productsBtn =
+    document.getElementById("productsBtn");
+
+const cartBtn =
+    document.getElementById("cartBtn");
+
+const cartCount =
+    document.getElementById("cartCount");
 
 const cartPanel =
     document.getElementById("cartPanel");
@@ -132,14 +166,11 @@ const cartEmpty =
 const cartTotal =
     document.getElementById("cartTotal");
 
-const cartCount =
-    document.getElementById("cartCount");
+const checkoutBtn =
+    document.getElementById("checkoutBtn");
 
-const checkoutButton =
-    document.getElementById("checkoutButton");
-
-const adminButton =
-    document.getElementById("adminButton");
+const adminBtn =
+    document.getElementById("adminBtn");
 
 const adminModal =
     document.getElementById("adminModal");
@@ -147,253 +178,198 @@ const adminModal =
 const closeAdmin =
     document.getElementById("closeAdmin");
 
-const adminPassword =
-    document.getElementById("adminPassword");
-
-const loginAdmin =
-    document.getElementById("loginAdmin");
-
-const loginError =
-    document.getElementById("loginError");
-
-const adminLogin =
-    document.getElementById("adminLogin");
+const loginBox =
+    document.getElementById("loginBox");
 
 const adminPanel =
     document.getElementById("adminPanel");
 
-const logoutAdmin =
-    document.getElementById("logoutAdmin");
+const adminPassword =
+    document.getElementById("adminPassword");
 
-const productName =
-    document.getElementById("productName");
+const loginBtn =
+    document.getElementById("loginBtn");
 
-const productPrice =
-    document.getElementById("productPrice");
+const loginError =
+    document.getElementById("loginError");
 
-const productCategory =
-    document.getElementById("productCategory");
+const logoutBtn =
+    document.getElementById("logoutBtn");
 
-const productImage =
-    document.getElementById("productImage");
+const pName =
+    document.getElementById("pName");
 
-const productDescription =
-    document.getElementById("productDescription");
+const pPrice =
+    document.getElementById("pPrice");
 
-const addProductButton =
-    document.getElementById("addProduct");
+const pCategory =
+    document.getElementById("pCategory");
 
-const adminProductList =
-    document.getElementById("adminProductList");
+const pImage =
+    document.getElementById("pImage");
 
-const adminProductCount =
-    document.getElementById("adminProductCount");
+const pDescription =
+    document.getElementById("pDescription");
+
+const addProductBtn =
+    document.getElementById("addProductBtn");
+
+const adminProducts =
+    document.getElementById("adminProducts");
+
+const adminCount =
+    document.getElementById("adminCount");
 
 const toast =
     document.getElementById("toast");
 
 
-/* ================= SAVE ================= */
+/* =========================
+   FORMAT
+========================= */
 
-function saveProducts() {
-
-    localStorage.setItem(
-        PRODUCTS_KEY,
-        JSON.stringify(products)
-    );
-
+function money(value) {
+    return new Intl.NumberFormat("fa-IR").format(value) + " تومان";
 }
 
 
-function saveCart() {
+function escapeHTML(value) {
 
-    localStorage.setItem(
-        CART_KEY,
-        JSON.stringify(cart)
-    );
+    const div = document.createElement("div");
 
-}
-
-
-/* ================= FORMAT PRICE ================= */
-
-function formatPrice(number) {
-
-    return new Intl.NumberFormat("fa-IR")
-        .format(number) + " تومان";
-
-}
-
-
-/* ================= ESCAPE HTML ================= */
-
-function escapeHtml(text) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent = text ?? "";
+    div.textContent = String(value ?? "");
 
     return div.innerHTML;
-
 }
 
 
-/* ================= PRODUCT IMAGE ================= */
+/* =========================
+   PRODUCT IMAGE
+========================= */
 
-function productImageHtml(product) {
+function imageHTML(product) {
 
-    const safeImage =
-        escapeHtml(product.image || "");
-
-    const safeName =
-        escapeHtml(product.name);
+    if (!product.image) {
+        return `
+            <div class="image-placeholder">
+                👗
+            </div>
+        `;
+    }
 
     return `
         <img
-            src="${safeImage}"
-            alt="${safeName}"
-            onerror="
-                this.style.display='none';
-                this.parentElement.classList.add('image-error');
-            "
+            src="${escapeHTML(product.image)}"
+            alt="${escapeHTML(product.name)}"
+            onerror="this.outerHTML='<div class=&quot;image-placeholder&quot;>👗</div>'"
         >
     `;
-
 }
 
 
-/* ================= RENDER PRODUCTS ================= */
+/* =========================
+   RENDER PRODUCTS
+========================= */
 
 function renderProducts() {
 
     const search =
-        searchInput.value
-            .trim()
-            .toLowerCase();
+        searchInput.value.trim().toLowerCase();
 
-    const selectedCategory =
-        document.querySelector(
-            ".category.active"
-        )?.dataset.category || "همه";
+    const activeCategory =
+        document.querySelector(".category.active");
 
-
-    let list =
-        products.filter(product => {
-
-            const matchesSearch =
-                product.name
-                    .toLowerCase()
-                    .includes(search) ||
-
-                product.description
-                    .toLowerCase()
-                    .includes(search);
+    const category =
+        activeCategory
+            ? activeCategory.dataset.category
+            : "همه";
 
 
-            const matchesCategory =
-                selectedCategory === "همه" ||
-                product.category === selectedCategory;
+    let list = products.filter(product => {
+
+        const name =
+            String(product.name).toLowerCase();
+
+        const description =
+            String(product.description).toLowerCase();
+
+        const matchesSearch =
+            name.includes(search) ||
+            description.includes(search);
+
+        const matchesCategory =
+            category === "همه" ||
+            product.category === category;
+
+        return matchesSearch && matchesCategory;
+    });
 
 
-            return matchesSearch &&
-                   matchesCategory;
+    /* SORT */
 
-        });
+    if (sortSelect.value === "cheap") {
 
+        list.sort((a,b) => a.price - b.price);
 
-    /* ================= SORT ================= */
+    } else if (sortSelect.value === "expensive") {
 
-    const sort =
-        sortProducts.value;
+        list.sort((a,b) => b.price - a.price);
 
+    } else if (sortSelect.value === "newest") {
 
-    if (sort === "cheap") {
-
-        list.sort(
-            (a, b) => a.price - b.price
-        );
-
+        list.sort((a,b) => b.id - a.id);
     }
 
-
-    if (sort === "expensive") {
-
-        list.sort(
-            (a, b) => b.price - a.price
-        );
-
-    }
-
-
-    if (sort === "newest") {
-
-        list.sort(
-            (a, b) => b.id - a.id
-        );
-
-    }
-
-
-    /* ================= EMPTY ================= */
 
     if (list.length === 0) {
 
-        productGrid.innerHTML = "";
+        productsGrid.innerHTML = "";
 
-        emptyProducts.style.display =
-            "block";
+        emptyState.classList.remove("hidden");
 
         return;
-
     }
 
 
-    emptyProducts.style.display =
-        "none";
+    emptyState.classList.add("hidden");
 
 
-    /* ================= CARDS ================= */
-
-    productGrid.innerHTML =
+    productsGrid.innerHTML =
         list.map(product => {
 
             return `
-
                 <article class="product-card">
 
                     <div class="product-image">
 
-                        ${productImageHtml(product)}
+                        ${imageHTML(product)}
 
                         <span class="product-category">
-                            ${escapeHtml(product.category)}
+                            ${escapeHTML(product.category)}
                         </span>
 
                     </div>
 
 
-                    <div class="product-body">
+                    <div class="product-info">
 
                         <h3>
-                            ${escapeHtml(product.name)}
+                            ${escapeHTML(product.name)}
                         </h3>
 
-
-                        <p class="product-description">
-                            ${escapeHtml(product.description)}
+                        <p class="description">
+                            ${escapeHTML(product.description)}
                         </p>
 
 
                         <div class="product-bottom">
 
-                            <strong class="product-price">
-                                ${formatPrice(product.price)}
+                            <strong class="price">
+                                ${money(product.price)}
                             </strong>
 
-
                             <button
-                                class="add-cart"
+                                class="add-btn"
                                 data-add="${product.id}"
                             >
                                 🛒 افزودن
@@ -404,7 +380,6 @@ function renderProducts() {
                     </div>
 
                 </article>
-
             `;
 
         }).join("");
@@ -414,97 +389,95 @@ function renderProducts() {
         .querySelectorAll("[data-add]")
         .forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+            button.addEventListener("click", () => {
 
-                    const id =
-                        Number(button.dataset.add);
-
-                    addToCart(id);
-
-                }
-            );
-
-        });
-
-}
-
-
-/* ================= CATEGORY ================= */
-
-categories.forEach(category => {
-
-    category.addEventListener(
-        "click",
-        () => {
-
-            categories.forEach(item => {
-
-                item.classList.remove("active");
+                addToCart(
+                    Number(button.dataset.add)
+                );
 
             });
 
+        });
+}
 
-            category.classList.add("active");
 
-            renderProducts();
+/* =========================
+   CATEGORY
+========================= */
 
-        }
-    );
+categoryButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        categoryButtons.forEach(item => {
+            item.classList.remove("active");
+        });
+
+        button.classList.add("active");
+
+        renderProducts();
+
+    });
 
 });
 
 
-/* ================= SEARCH ================= */
+/* =========================
+   SEARCH / SORT
+========================= */
 
 searchInput.addEventListener(
     "input",
     renderProducts
 );
 
-
-/* ================= SORT ================= */
-
-sortProducts.addEventListener(
+sortSelect.addEventListener(
     "change",
     renderProducts
 );
 
 
-/* ================= CART ================= */
+/* =========================
+   PRODUCTS BUTTON
+========================= */
 
-function addToCart(productId) {
+productsBtn.addEventListener("click", () => {
 
-    const product =
-        products.find(
-            p => p.id === productId
-        );
-
-
-    if (!product) return;
-
-
-    const existing =
-        cart.find(
-            item => item.id === productId
-        );
-
-
-    if (existing) {
-
-        existing.quantity++;
-
-    } else {
-
-        cart.push({
-
-            id: productId,
-
-            quantity: 1
-
+    document
+        .getElementById("products")
+        .scrollIntoView({
+            behavior: "smooth",
+            block: "start"
         });
 
+});
+
+
+/* =========================
+   CART
+========================= */
+
+function addToCart(id) {
+
+    const product =
+        products.find(p => p.id === id);
+
+    if (!product) {
+        return;
+    }
+
+
+    const item =
+        cart.find(item => item.id === id);
+
+
+    if (item) {
+        item.quantity += 1;
+    } else {
+        cart.push({
+            id: id,
+            quantity: 1
+        });
     }
 
 
@@ -512,16 +485,10 @@ function addToCart(productId) {
 
     renderCart();
 
-    showToast(
-        "محصول به سبد خرید اضافه شد 💗"
-    );
-
-    openCart();
+    showToast("محصول به سبد اضافه شد 💗");
 
 }
 
-
-/* ================= RENDER CART ================= */
 
 function renderCart() {
 
@@ -529,25 +496,20 @@ function renderCart() {
 
         cartItems.innerHTML = "";
 
-        cartEmpty.style.display =
-            "flex";
+        cartEmpty.style.display = "flex";
 
         cartCount.textContent = "0";
 
-        cartTotal.textContent =
-            "۰ تومان";
+        cartTotal.textContent = "۰ تومان";
 
         return;
-
     }
 
 
-    cartEmpty.style.display =
-        "none";
+    cartEmpty.style.display = "none";
 
 
     let total = 0;
-
     let count = 0;
 
 
@@ -560,47 +522,51 @@ function renderCart() {
                 );
 
 
-            if (!product) return "";
+            if (!product) {
+                return "";
+            }
 
 
             total +=
-                product.price *
-                item.quantity;
+                product.price * item.quantity;
 
-
-            count +=
-                item.quantity;
+            count += item.quantity;
 
 
             return `
-
                 <div class="cart-item">
 
-                    <img
-                        class="cart-item-image"
-                        src="${escapeHtml(product.image)}"
-                        alt="${escapeHtml(product.name)}"
-                    >
+                    ${
+                        product.image
+                        ?
+                        `<img
+                            src="${escapeHTML(product.image)}"
+                            alt="${escapeHTML(product.name)}"
+                        >`
+                        :
+                        `<div class="image-placeholder">
+                            👗
+                        </div>`
+                    }
 
 
                     <div class="cart-item-info">
 
-                        <h4>
-                            ${escapeHtml(product.name)}
-                        </h4>
+                        <b>
+                            ${escapeHTML(product.name)}
+                        </b>
 
-                        <div class="cart-item-price">
-                            ${formatPrice(product.price)}
-                        </div>
+                        <span class="cart-item-price">
+                            ${money(product.price)}
+                        </span>
 
 
-                        <div class="cart-item-controls">
+                        <div class="qty">
 
                             <button
-                                class="qty-button"
-                                data-minus="${product.id}"
+                                data-plus="${product.id}"
                             >
-                                −
+                                +
                             </button>
 
                             <span>
@@ -608,14 +574,13 @@ function renderCart() {
                             </span>
 
                             <button
-                                class="qty-button"
-                                data-plus="${product.id}"
+                                data-minus="${product.id}"
                             >
-                                +
+                                -
                             </button>
 
                             <button
-                                class="remove-item"
+                                class="remove"
                                 data-remove="${product.id}"
                             >
                                 حذف
@@ -626,35 +591,31 @@ function renderCart() {
                     </div>
 
                 </div>
-
             `;
 
         }).join("");
 
 
     cartCount.textContent =
-        count;
+        String(count);
 
 
     cartTotal.textContent =
-        formatPrice(total);
+        money(total);
 
 
     document
         .querySelectorAll("[data-plus]")
         .forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+            button.addEventListener("click", () => {
 
-                    changeQuantity(
-                        Number(button.dataset.plus),
-                        1
-                    );
+                changeQuantity(
+                    Number(button.dataset.plus),
+                    1
+                );
 
-                }
-            );
+            });
 
         });
 
@@ -663,17 +624,14 @@ function renderCart() {
         .querySelectorAll("[data-minus]")
         .forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+            button.addEventListener("click", () => {
 
-                    changeQuantity(
-                        Number(button.dataset.minus),
-                        -1
-                    );
+                changeQuantity(
+                    Number(button.dataset.minus),
+                    -1
+                );
 
-                }
-            );
+            });
 
         });
 
@@ -682,36 +640,27 @@ function renderCart() {
         .querySelectorAll("[data-remove]")
         .forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+            button.addEventListener("click", () => {
 
-                    removeFromCart(
-                        Number(button.dataset.remove)
-                    );
+                removeFromCart(
+                    Number(button.dataset.remove)
+                );
 
-                }
-            );
+            });
 
         });
 
 }
 
 
-/* ================= QUANTITY ================= */
-
-function changeQuantity(
-    productId,
-    amount
-) {
+function changeQuantity(id, amount) {
 
     const item =
-        cart.find(
-            item => item.id === productId
-        );
+        cart.find(item => item.id === id);
 
-
-    if (!item) return;
+    if (!item) {
+        return;
+    }
 
 
     item.quantity += amount;
@@ -721,7 +670,7 @@ function changeQuantity(
 
         cart =
             cart.filter(
-                item => item.id !== productId
+                item => item.id !== id
             );
 
     }
@@ -730,28 +679,25 @@ function changeQuantity(
     saveCart();
 
     renderCart();
-
 }
 
 
-/* ================= REMOVE CART ================= */
-
-function removeFromCart(productId) {
+function removeFromCart(id) {
 
     cart =
         cart.filter(
-            item => item.id !== productId
+            item => item.id !== id
         );
-
 
     saveCart();
 
     renderCart();
-
 }
 
 
-/* ================= OPEN CART ================= */
+/* =========================
+   OPEN / CLOSE CART
+========================= */
 
 function openCart() {
 
@@ -771,17 +717,15 @@ function closeCartPanel() {
 }
 
 
-cartButton.addEventListener(
+cartBtn.addEventListener(
     "click",
     openCart
 );
-
 
 closeCart.addEventListener(
     "click",
     closeCartPanel
 );
-
 
 overlay.addEventListener(
     "click",
@@ -789,69 +733,60 @@ overlay.addEventListener(
 );
 
 
-/* ================= ADMIN ================= */
+/* =========================
+   ADMIN OPEN
+========================= */
 
-adminButton.addEventListener(
-    "click",
-    () => {
+adminBtn.addEventListener("click", () => {
 
-        adminModal.classList.add("active");
+    adminModal.classList.add("active");
 
-        adminPassword.focus();
+    loginBox.classList.remove("hidden");
 
-    }
-);
+    adminPanel.classList.add("hidden");
 
+    loginError.style.display = "none";
 
-closeAdmin.addEventListener(
-    "click",
-    () => {
+    adminPassword.value = "";
 
-        adminModal.classList.remove(
-            "active"
-        );
-
-    }
-);
+});
 
 
-/* ================= LOGIN ================= */
+closeAdmin.addEventListener("click", () => {
 
-function login() {
+    adminModal.classList.remove("active");
 
-    if (
-        adminPassword.value ===
-        ADMIN_PASSWORD
-    ) {
+});
 
-        adminLogin.classList.add(
-            "hidden"
-        );
 
-        adminPanel.classList.remove(
-            "hidden"
-        );
+/* =========================
+   LOGIN
+========================= */
 
-        loginError.style.display =
-            "none";
+function loginAdmin() {
 
-        adminPassword.value = "";
+    if (adminPassword.value === ADMIN_PASSWORD) {
+
+        loginBox.classList.add("hidden");
+
+        adminPanel.classList.remove("hidden");
+
+        loginError.style.display = "none";
 
         renderAdminProducts();
 
     } else {
 
-        loginError.style.display =
-            "block";
+        loginError.style.display = "block";
 
     }
 
 }
 
 
-loginAdmin.addEventListener(
+loginBtn.addEventListener(
     "click",
-    login
+    loginAdmin
 );
 
 
@@ -860,36 +795,33 @@ adminPassword.addEventListener(
     event => {
 
         if (event.key === "Enter") {
-
-            login();
-
+            loginAdmin();
         }
 
     }
 );
 
 
-/* ================= LOGOUT ================= */
+/* =========================
+   LOGOUT
+========================= */
 
-logoutAdmin.addEventListener(
-    "click",
-    () => {
+logoutBtn.addEventListener("click", () => {
 
-        adminPanel.classList.add(
-            "hidden"
-        );
+    adminPanel.classList.add("hidden");
 
-        adminLogin.classList.remove(
-            "hidden"
-        );
+    loginBox.classList.remove("hidden");
 
-    }
-);
+    adminPassword.value = "";
+
+});
 
 
-/* ================= ADD PRODUCT ================= */
+/* =========================
+   ADD PRODUCT
+========================= */
 
-addProductButton.addEventListener(
+addProductBtn.addEventListener(
     "click",
     addProduct
 );
@@ -898,67 +830,53 @@ addProductButton.addEventListener(
 function addProduct() {
 
     const name =
-        productName.value.trim();
+        pName.value.trim();
 
     const price =
-        Number(productPrice.value);
+        Number(pPrice.value);
 
     const category =
-        productCategory.value;
+        pCategory.value;
 
     const image =
-        productImage.value.trim() ||
-        "assets/product1.jpg";
+        pImage.value.trim();
 
     const description =
-        productDescription.value.trim() ||
-        "محصول شیک و جدید الف شاپ";
+        pDescription.value.trim();
 
 
     if (!name) {
-
-        alert(
-            "لطفاً نام محصول را وارد کن."
-        );
-
+        alert("نام محصول را وارد کن.");
         return;
-
     }
 
 
     if (!price || price <= 0) {
-
-        alert(
-            "لطفاً قیمت محصول را وارد کن."
-        );
-
+        alert("قیمت محصول را وارد کن.");
         return;
-
     }
 
 
-    const newProduct = {
+    const product = {
 
-        id:
-            Date.now(),
+        id: Date.now(),
 
-        name,
+        name: name,
 
-        category,
+        price: price,
 
-        price,
+        category: category,
 
-        image,
+        image: image,
 
-        description
+        description:
+            description ||
+            "محصول جدید الف شاپ"
 
     };
 
 
-    products.unshift(
-        newProduct
-    );
-
+    products.unshift(product);
 
     saveProducts();
 
@@ -967,78 +885,77 @@ function addProduct() {
     renderAdminProducts();
 
 
-    productName.value = "";
-
-    productPrice.value = "";
-
-    productImage.value = "";
-
-    productDescription.value = "";
+    pName.value = "";
+    pPrice.value = "";
+    pImage.value = "";
+    pDescription.value = "";
 
 
-    showToast(
-        "محصول جدید اضافه شد ✅"
-    );
+    showToast("محصول با موفقیت اضافه شد ✅");
 
 }
 
 
-/* ================= ADMIN PRODUCTS ================= */
+/* =========================
+   ADMIN PRODUCTS
+========================= */
 
 function renderAdminProducts() {
 
-    adminProductCount.textContent =
-        `${products.length} محصول`;
+    adminCount.textContent =
+        products.length;
 
 
     if (products.length === 0) {
 
-        adminProductList.innerHTML = `
-            <p>
-                هنوز محصولی وجود ندارد.
-            </p>
-        `;
+        adminProducts.innerHTML =
+            "<p>محصولی وجود ندارد.</p>";
 
         return;
-
     }
 
 
-    adminProductList.innerHTML =
+    adminProducts.innerHTML =
         products.map(product => {
 
             return `
-
                 <div class="admin-product">
 
-                    <img
-                        src="${escapeHtml(product.image)}"
-                        alt="${escapeHtml(product.name)}"
-                    >
+                    ${
+                        product.image
+                        ?
+                        `<img
+                            src="${escapeHTML(product.image)}"
+                            alt=""
+                        >`
+                        :
+                        `<div class="image-placeholder">
+                            👗
+                        </div>`
+                    }
 
 
                     <div class="admin-product-info">
 
-                        <strong>
-                            ${escapeHtml(product.name)}
-                        </strong>
+                        <b>
+                            ${escapeHTML(product.name)}
+                        </b>
 
                         <span>
-                            ${formatPrice(product.price)}
+                            ${money(product.price)}
                         </span>
 
                     </div>
 
 
                     <button
-                        class="delete-product"
+                        class="delete-btn"
                         data-delete="${product.id}"
                     >
-                        🗑️ حذف
+                        🗑️
                     </button>
 
                 </div>
-
             `;
 
         }).join("");
@@ -1048,55 +965,55 @@ function renderAdminProducts() {
         .querySelectorAll("[data-delete]")
         .forEach(button => {
 
-            button.addEventListener(
-                "click",
-                () => {
+            button.addEventListener("click", () => {
 
-                    deleteProduct(
-                        Number(
-                            button.dataset.delete
-                        )
-                    );
+                deleteProduct(
+                    Number(button.dataset.delete)
+                );
 
-                }
-            );
+            });
 
         });
 
 }
 
 
-/* ================= DELETE PRODUCT ================= */
+/* =========================
+   DELETE PRODUCT
+========================= */
 
-function deleteProduct(productId) {
+function deleteProduct(id) {
 
     const product =
-        products.find(
-            p => p.id === productId
-        );
+        products.find(p => p.id === id);
+
+    if (!product) {
+        return;
+    }
 
 
-    if (!product) return;
-
-
-    const confirmed =
+    const yes =
         confirm(
-            `محصول «${product.name}» حذف شود؟`
+            "محصول «" +
+            product.name +
+            "» حذف شود؟"
         );
 
 
-    if (!confirmed) return;
+    if (!yes) {
+        return;
+    }
 
 
     products =
         products.filter(
-            p => p.id !== productId
+            p => p.id !== id
         );
 
 
     cart =
         cart.filter(
-            item => item.id !== productId
+            item => item.id !== id
         );
 
 
@@ -1110,17 +1027,16 @@ function deleteProduct(productId) {
 
     renderAdminProducts();
 
-
-    showToast(
-        "محصول حذف شد 🗑️"
-    );
+    showToast("محصول حذف شد 🗑️");
 
 }
 
 
-/* ================= CHECKOUT ================= */
+/* =========================
+   CHECKOUT
+========================= */
 
-checkoutButton.addEventListener(
+checkoutBtn.addEventListener(
     "click",
     () => {
 
@@ -1131,54 +1047,46 @@ checkoutButton.addEventListener(
             );
 
             return;
-
         }
 
 
         alert(
-            "سبد خرید شما آماده ثبت سفارش است 💗\n\nبرای اتصال به درگاه یا ثبت سفارش واقعی باید بخش سفارش و سرور به سایت اضافه شود."
+            "سبد خرید آماده ثبت سفارش است."
         );
 
     }
 );
 
 
-/* ================= TOAST ================= */
+/* =========================
+   TOAST
+========================= */
 
 let toastTimer;
 
-
 function showToast(message) {
 
-    toast.textContent =
-        message;
+    toast.textContent = message;
 
-    toast.classList.add(
-        "show"
-    );
+    toast.classList.add("show");
 
 
-    clearTimeout(
-        toastTimer
-    );
+    clearTimeout(toastTimer);
 
 
     toastTimer =
-        setTimeout(
-            () => {
+        setTimeout(() => {
 
-                toast.classList.remove(
-                    "show"
-                );
+            toast.classList.remove("show");
 
-            },
-            2200
-        );
+        }, 2200);
 
 }
 
 
-/* ================= START ================= */
+/* =========================
+   START
+========================= */
 
 renderProducts();
 

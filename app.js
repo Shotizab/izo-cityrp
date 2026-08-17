@@ -1,401 +1,1300 @@
-function loadScriptSeq(urls,cb,failCb){
-  let i=0;
-  function next(){
-    if(i>=urls.length){ failCb&&failCb(); return; }
-    const s=document.createElement('script');
-    s.src=urls[i]; s.onload=cb;
-    s.onerror=function(){ i++; next(); };
-    document.head.appendChild(s);
-  }
-  next();
-}
-const FB_APP_URLS=['https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js','https://cdn.jsdelivr.net/npm/firebase@10.13.1/firebase-app-compat.js','https://unpkg.com/firebase@10.13.1/firebase-app-compat.js'];
-const FB_FS_URLS=['https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js','https://cdn.jsdelivr.net/npm/firebase@10.13.1/firebase-firestore-compat.js','https://unpkg.com/firebase@10.13.1/firebase-firestore-compat.js'];
-function showFbError(){
-  document.body.insertAdjacentHTML('afterbegin','<div style="background:#3a0d16;color:#ffb3c6;padding:14px;text-align:center;font-family:sans-serif;font-size:14px;">اتصال به دیتابیس برقرار نشد. اینترنتت رو چک کن یا صفحه رو رفرش کن.</div>');
-}
-loadScriptSeq(FB_APP_URLS,function(){ loadScriptSeq(FB_FS_URLS,startApp,showFbError); },showFbError);
+const ADMIN_PASSWORD = "fal";
 
-function startApp(){
-const ADMIN_PASSWORD="fal";
-const firebaseConfig={
-  apiKey:"AIzaSyB4HTC5_rJ-phcWE_iKHKbWZkQzjCLdc50",
-  authDomain:"izo-city.firebaseapp.com",
-  projectId:"izo-city",
-  storageBucket:"izo-city.firebasestorage.app",
-  messagingSenderId:"1047171617464",
-  appId:"1:1047171617464:web:c2536811746524711d9a4d"
+const KEY = {
+  products: "alf_products",
+  cart: "alf_cart",
+  users: "alf_users",
+  session: "alf_session",
+  orders: "alf_orders",
+  gateway: "alf_gateway"
 };
-firebase.initializeApp(firebaseConfig);
-const db=firebase.firestore();
-const siteDocRef=db.collection('alefShop').doc('siteData');
 
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
-function escapeHtml(str){ const d=document.createElement('div'); d.innerText=str||''; return d.innerHTML; }
-function money(n){ return Math.round(n).toLocaleString('fa-IR')+' تومان'; }
 
-let siteData={products:[],pendingOrders:[],confirmedOrders:[],gatewayLink:''};
-let cart={};
-let currentUser=null;
-let activeCategory='همه';
+const defaultProducts = [
 
-async function loadData(){
-  try{
-    const snap=await siteDocRef.get();
-    if(snap.exists){
-      const d=snap.data();
-      siteData.products=d.products||[];
-      siteData.pendingOrders=d.pendingOrders||[];
-      siteData.confirmedOrders=d.confirmedOrders||[];
-      siteData.gatewayLink=d.gatewayLink||'';
-    }else{
-      await siteDocRef.set({products:[],pendingOrders:[],confirmedOrders:[],gatewayLink:''});
-    }
-  }catch(e){ console.error('load failed',e); }
-  restoreSession();
-  render();
+  {
+    id: 1,
+    name: "شومیز سفید زنانه",
+    price: 890000,
+    category: "شومیز",
+    image: "",
+    description: "شومیز سفید زنانه شیک و جذاب"
+  },
+
+  {
+    id: 2,
+    name: "مانتو زنانه",
+    price: 1290000,
+    category: "مانتو",
+    image: "",
+    description: "مانتو زنانه مناسب استفاده روزمره"
+  },
+
+  {
+    id: 3,
+    name: "ست زنانه",
+    price: 1490000,
+    category: "ست زنانه",
+    image: "",
+    description: "ست زنانه شیک و راحت"
+  },
+
+  {
+    id: 4,
+    name: "لباس زنانه",
+    price: 1190000,
+    category: "لباس زنانه",
+    image: "",
+    description: "لباس زنانه با طراحی جدید"
+  }
+
+];
+
+
+function load(key, fallback) {
+
+  try {
+
+    const value = localStorage.getItem(key);
+
+    return value
+      ? JSON.parse(value)
+      : fallback;
+
+  } catch {
+
+    return fallback;
+
+  }
+
 }
-async function saveData(){
-  try{
-    await siteDocRef.set({
-      products:siteData.products,pendingOrders:siteData.pendingOrders,
-      confirmedOrders:siteData.confirmedOrders,gatewayLink:siteData.gatewayLink
+
+
+function save(key, value) {
+
+  localStorage.setItem(
+    key,
+    JSON.stringify(value)
+  );
+
+}
+
+
+let products =
+  load(KEY.products, defaultProducts);
+
+let cart =
+  load(KEY.cart, []);
+
+let users =
+  load(KEY.users, []);
+
+let orders =
+  load(KEY.orders, []);
+
+let session =
+  load(KEY.session, null);
+
+let gateway =
+  localStorage.getItem(KEY.gateway) || "";
+
+
+function money(number) {
+
+  return new Intl.NumberFormat("fa-IR")
+    .format(number) + " تومان";
+
+}
+
+
+function toast(message) {
+
+  const element =
+    document.getElementById("toast");
+
+  element.textContent = message;
+
+  element.style.display = "block";
+
+  clearTimeout(window.toastTimer);
+
+  window.toastTimer =
+    setTimeout(() => {
+
+      element.style.display = "none";
+
+    }, 2500);
+
+}
+
+
+function openModal(id) {
+
+  document
+    .getElementById(id)
+    .classList.add("show");
+
+}
+
+
+function closeModal(id) {
+
+  document
+    .getElementById(id)
+    .classList.remove("show");
+
+}
+
+
+function goProducts() {
+
+  document
+    .getElementById("products")
+    .scrollIntoView({
+      behavior: "smooth"
     });
-  }catch(e){ console.error('save failed',e); }
-}
-siteDocRef.onSnapshot((snap)=>{
-  if(!snap.exists) return;
-  const d=snap.data();
-  siteData.products=d.products||[];
-  siteData.pendingOrders=d.pendingOrders||[];
-  siteData.confirmedOrders=d.confirmedOrders||[];
-  siteData.gatewayLink=d.gatewayLink||'';
-  render();
-});
 
-function restoreSession(){
-  const phone=localStorage.getItem('alefShopPhone');
-  if(!phone) return;
-  const u=siteData.users_cache; // not used, users stored separately below
 }
 
-/* users stored in a separate doc so login works even before products load fully */
-let users=[];
-const usersDocRef=db.collection('alefShop').doc('users');
-async function loadUsers(){
-  try{
-    const snap=await usersDocRef.get();
-    if(snap.exists) users=snap.data().list||[];
-    else await usersDocRef.set({list:[]});
-  }catch(e){ console.error('users load failed',e); }
-  const phone=localStorage.getItem('alefShopPhone');
-  if(phone){
-    const u=users.find(x=>x.phone===phone);
-    if(u) currentUser=u;
+
+function renderProducts() {
+
+  const grid =
+    document.getElementById("productsGrid");
+
+  const search =
+    document
+      .getElementById("searchInput")
+      .value
+      .toLowerCase();
+
+
+  const activeCategory =
+    document.querySelector(
+      ".categories button.active"
+    )?.dataset.category || "همه";
+
+
+  const filtered =
+    products.filter(product => {
+
+      const categoryOK =
+        activeCategory === "همه" ||
+        product.category === activeCategory;
+
+      const searchOK =
+        product.name
+          .toLowerCase()
+          .includes(search);
+
+      return categoryOK && searchOK;
+
+    });
+
+
+  grid.innerHTML =
+    filtered.map(product => `
+
+      <div class="product">
+
+        <div class="product-image">
+
+          ${
+            product.image
+
+              ? `<img src="${product.image}"
+                  onerror="this.style.display='none'">`
+
+              : "👗"
+          }
+
+        </div>
+
+        <div class="product-info">
+
+          <h3>${product.name}</h3>
+
+          <p>${product.description}</p>
+
+          <div class="product-bottom">
+
+            <span class="price">
+              ${money(product.price)}
+            </span>
+
+            <button
+              class="add"
+              onclick="addToCart(${product.id})"
+            >
+              🛒 افزودن
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+
+function addToCart(id) {
+
+  const item =
+    cart.find(x => x.id === id);
+
+  if (item) {
+
+    item.quantity++;
+
+  } else {
+
+    cart.push({
+      id,
+      quantity: 1
+    });
+
   }
-  updateAccountUI();
-}
-usersDocRef.onSnapshot((snap)=>{
-  if(!snap.exists) return;
-  users=snap.data().list||[];
-  if(currentUser){
-    const u=users.find(x=>x.phone===currentUser.phone);
-    if(u) currentUser=u;
-  }
-});
-async function saveUsers(){
-  try{ await usersDocRef.set({list:users}); }catch(e){ console.error('users save failed',e); }
-}
 
-function render(){
-  renderProducts();
+  save(KEY.cart, cart);
+
   renderCart();
+
+  toast("محصول به سبد اضافه شد 💗");
+
+}
+
+
+function renderCart() {
+
+  const container =
+    document.getElementById("cartItems");
+
+  let total = 0;
+
+  let count = 0;
+
+
+  container.innerHTML =
+    cart.map(item => {
+
+      const product =
+        products.find(
+          x => x.id === item.id
+        );
+
+      if (!product) return "";
+
+      total +=
+        product.price *
+        item.quantity;
+
+      count += item.quantity;
+
+
+      return `
+
+        <div class="cart-item">
+
+          <div class="cart-info">
+
+            <b>${product.name}</b>
+
+            <small>
+              ${money(product.price)}
+            </small>
+
+            <div class="quantity">
+
+              <button
+                onclick="changeQuantity(${product.id},1)"
+              >
+                +
+              </button>
+
+              <span>
+                ${item.quantity}
+              </span>
+
+              <button
+                onclick="changeQuantity(${product.id},-1)"
+              >
+                −
+              </button>
+
+              <button
+                class="delete"
+                onclick="removeFromCart(${product.id})"
+              >
+                حذف
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }).join("");
+
+
+  document.getElementById(
+    "cartTotal"
+  ).textContent = money(total);
+
+
+  document.getElementById(
+    "cartCount"
+  ).textContent = count;
+
+}
+
+
+function changeQuantity(id, amount) {
+
+  const item =
+    cart.find(x => x.id === id);
+
+  if (!item) return;
+
+  item.quantity += amount;
+
+  if (item.quantity <= 0) {
+
+    cart =
+      cart.filter(
+        x => x.id !== id
+      );
+
+  }
+
+  save(KEY.cart, cart);
+
+  renderCart();
+
+}
+
+
+function removeFromCart(id) {
+
+  cart =
+    cart.filter(
+      x => x.id !== id
+    );
+
+  save(KEY.cart, cart);
+
+  renderCart();
+
+}
+
+
+function login() {
+
+  const username =
+    document
+      .getElementById("loginUsername")
+      .value
+      .trim();
+
+  const phone =
+    document
+      .getElementById("loginPhone")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("loginPassword")
+      .value;
+
+
+  const user =
+    users.find(x =>
+      x.username === username &&
+      x.phone === phone &&
+      x.password === password
+    );
+
+
+  if (!user) {
+
+    document.getElementById(
+      "loginMessage"
+    ).textContent =
+      "اطلاعات ورود صحیح نیست.";
+
+    return;
+
+  }
+
+
+  session = {
+    username: user.username,
+    phone: user.phone
+  };
+
+
+  save(KEY.session, session);
+
+  toast("ورود موفق بود ✅");
+
+  showProfile();
+
+}
+
+
+function register() {
+
+  const username =
+    document
+      .getElementById("registerUsername")
+      .value
+      .trim();
+
+  const phone =
+    document
+      .getElementById("registerPhone")
+      .value
+      .trim();
+
+  const password =
+    document
+      .getElementById("registerPassword")
+      .value;
+
+  const password2 =
+    document
+      .getElementById("registerPassword2")
+      .value;
+
+
+  if (!username || !phone || !password) {
+
+    document.getElementById(
+      "registerMessage"
+    ).textContent =
+      "همه فیلدها را کامل کن.";
+
+    return;
+
+  }
+
+
+  if (password !== password2) {
+
+    document.getElementById(
+      "registerMessage"
+    ).textContent =
+      "تکرار رمز عبور صحیح نیست.";
+
+    return;
+
+  }
+
+
+  if (
+    users.some(
+      x =>
+        x.username === username ||
+        x.phone === phone
+    )
+  ) {
+
+    document.getElementById(
+      "registerMessage"
+    ).textContent =
+      "این نام کاربری یا شماره قبلاً ثبت شده.";
+
+    return;
+
+  }
+
+
+  const user = {
+    username,
+    phone,
+    password
+  };
+
+
+  users.push(user);
+
+  save(KEY.users, users);
+
+
+  session = {
+    username,
+    phone
+  };
+
+  save(KEY.session, session);
+
+  toast("حساب ساخته شد 💗");
+
+  showProfile();
+
+}
+
+
+function showProfile() {
+
+  document
+    .getElementById("loginBox")
+    .classList.add("hidden");
+
+  document
+    .getElementById("registerBox")
+    .classList.add("hidden");
+
+  document
+    .getElementById("profileBox")
+    .classList.remove("hidden");
+
+
+  document.getElementById(
+    "profileName"
+  ).textContent =
+    "نام کاربری: " + session.username;
+
+
+  document.getElementById(
+    "profilePhone"
+  ).textContent =
+    "شماره تماس: " + session.phone;
+
+
+  renderMyOrders();
+
+}
+
+
+function renderMyOrders() {
+
+  const box =
+    document.getElementById(
+      "myOrders"
+    );
+
+
+  const mine =
+    orders.filter(
+      x =>
+        x.username === session.username
+    );
+
+
+  box.innerHTML =
+    mine.length
+
+      ? mine.map(order => `
+
+          <div class="order-card">
+
+            <b>
+              ${order.id}
+            </b>
+
+            <p>
+              ${money(order.total)}
+            </p>
+
+            <small>
+              وضعیت: ${order.status}
+            </small>
+
+          </div>
+
+        `).join("")
+
+      : "<p>هنوز سفارشی نداری.</p>";
+
+}
+
+
+function checkout() {
+
+  if (!cart.length) {
+
+    toast("سبد خرید خالی است.");
+
+    return;
+
+  }
+
+
+  if (!session) {
+
+    closeModal("cartModal");
+
+    openModal("accountModal");
+
+    return;
+
+  }
+
+
+  let total = 0;
+
+
+  const items =
+    cart.map(item => {
+
+      const product =
+        products.find(
+          x => x.id === item.id
+        );
+
+      total +=
+        product.price *
+        item.quantity;
+
+
+      return {
+
+        id: product.id,
+
+        name: product.name,
+
+        price: product.price,
+
+        quantity: item.quantity
+
+      };
+
+    });
+
+
+  const orderId =
+    "AF-" + Date.now();
+
+
+  const order = {
+
+    id: orderId,
+
+    username: session.username,
+
+    phone: session.phone,
+
+    items,
+
+    total,
+
+    status: "در انتظار بررسی",
+
+    date:
+      new Date()
+        .toLocaleString("fa-IR")
+
+  };
+
+
+  orders.unshift(order);
+
+  save(KEY.orders, orders);
+
+
+  cart = [];
+
+  save(KEY.cart, cart);
+
+  renderCart();
+
+
+  if (gateway) {
+
+    const paymentUrl =
+      gateway
+        .replaceAll(
+          "{amount}",
+          encodeURIComponent(total)
+        )
+        .replaceAll(
+          "{orderId}",
+          encodeURIComponent(orderId)
+        );
+
+
+    window.open(
+      paymentUrl,
+      "_blank"
+    );
+
+    toast(
+      "سفارش ثبت شد و درگاه باز شد 💳"
+    );
+
+  } else {
+
+    toast(
+      "سفارش ثبت شد؛ لینک درگاه تنظیم نشده."
+    );
+
+  }
+
+}
+
+
+function adminLogin() {
+
+  const password =
+    document
+      .getElementById(
+        "adminPassword"
+      )
+      .value;
+
+
+  if (password !== ADMIN_PASSWORD) {
+
+    document.getElementById(
+      "adminMessage"
+    ).textContent =
+      "رمز مدیریت اشتباه است.";
+
+    return;
+
+  }
+
+
+  document
+    .getElementById("adminLogin")
+    .classList.add("hidden");
+
+
+  document
+    .getElementById("adminPanel")
+    .classList.remove("hidden");
+
+
+  document.getElementById(
+    "gatewayInput"
+  ).value = gateway;
+
+
+  renderAdmin();
+
+}
+
+
+function renderAdmin() {
+
+  renderOrders();
+
   renderAdminProducts();
-  renderAdminPending();
-  renderAdminConfirmed();
-  renderGatewayInput();
+
 }
 
-function renderProducts(){
-  const grid=document.getElementById('productsGrid');
-  let list=siteData.products.filter(p=>activeCategory==='همه'||p.category===activeCategory);
-  const sort=document.getElementById('sortSelect').value;
-  if(sort==='cheap') list=[...list].sort((a,b)=>a.price-b.price);
-  else if(sort==='expensive') list=[...list].sort((a,b)=>b.price-a.price);
-  else list=[...list].sort((a,b)=>b.ts-a.ts);
 
-  if(!list.length){
-    grid.innerHTML='<div class="empty-state">🛍️<h3>محصولی پیدا نشد</h3><p>جستجو یا دسته‌بندی رو تغییر بده.</p></div>';
+function renderOrders() {
+
+  const pending =
+    orders.filter(
+      x =>
+        x.status === "در انتظار بررسی"
+    );
+
+
+  const accepted =
+    orders.filter(
+      x =>
+        x.status === "تأیید شده"
+    );
+
+
+  document.getElementById(
+    "pendingOrders"
+  ).innerHTML =
+    pending.length
+
+      ? pending
+          .map(orderHTML)
+          .join("")
+
+      : "<p>سفارشی نیست.";
+
+
+  document.getElementById(
+    "acceptedOrders"
+  ).innerHTML =
+    accepted.length
+
+      ? accepted
+          .map(orderHTML)
+          .join("")
+
+      : "<p>سفارشی نیست.";
+
+}
+
+
+function orderHTML(order) {
+
+  return `
+
+    <div class="order-card">
+
+      <b>
+        سفارش ${order.id}
+      </b>
+
+      <p>
+        کاربر:
+        ${order.username}
+      </p>
+
+      <p>
+        شماره:
+        ${order.phone}
+      </p>
+
+      <ul>
+
+        ${
+          order.items
+            .map(
+              item =>
+                `<li>
+                  ${item.name}
+                  × ${item.quantity}
+                </li>`
+            )
+            .join("")
+        }
+
+      </ul>
+
+      <strong>
+        ${money(order.total)}
+      </strong>
+
+      <div class="order-actions">
+
+        ${
+          order.status ===
+          "در انتظار بررسی"
+
+            ? `
+
+              <button
+                class="accept"
+                onclick="acceptOrder('${order.id}')"
+              >
+                ✅ قبول سفارش
+              </button>
+
+              <button
+                class="reject"
+                onclick="rejectOrder('${order.id}')"
+              >
+                ❌ رد سفارش
+              </button>
+
+            `
+
+            : ""
+
+        }
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+function acceptOrder(id) {
+
+  const order =
+    orders.find(
+      x => x.id === id
+    );
+
+
+  if (!order) return;
+
+
+  order.status =
+    "تأیید شده";
+
+
+  save(KEY.orders, orders);
+
+
+  renderAdmin();
+
+  renderMyOrders();
+
+  toast(
+    "سفارش قبول شد و وارد سفارش‌های اصلی شد ✅"
+  );
+
+}
+
+
+function rejectOrder(id) {
+
+  const order =
+    orders.find(
+      x => x.id === id
+    );
+
+
+  if (!order) return;
+
+
+  order.status =
+    "رد شده";
+
+
+  save(KEY.orders, orders);
+
+  renderAdmin();
+
+  toast(
+    "سفارش رد شد."
+  );
+
+}
+
+
+function addProduct() {
+
+  const name =
+    document
+      .getElementById(
+        "productName"
+      )
+      .value
+      .trim();
+
+  const price =
+    Number(
+      document
+        .getElementById(
+          "productPrice"
+        )
+        .value
+    );
+
+  const category =
+    document
+      .getElementById(
+        "productCategory"
+      )
+      .value;
+
+  const image =
+    document
+      .getElementById(
+        "productImage"
+      )
+      .value
+      .trim();
+
+  const description =
+    document
+      .getElementById(
+        "productDescription"
+      )
+      .value
+      .trim();
+
+
+  if (!name || !price) {
+
+    toast(
+      "نام و قیمت محصول را وارد کن."
+    );
+
     return;
+
   }
-  grid.innerHTML=list.map(p=>`
-    <div class="product-card">
-      <div class="product-img">${p.image?`<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.name)}">`:'👗'}</div>
-      <div class="product-body">
-        <div class="product-cat">${escapeHtml(p.category)}</div>
-        <div class="product-name">${escapeHtml(p.name)}</div>
-        <div class="product-price">${money(p.price)}</div>
-        <button class="add-cart-btn" data-add="${p.id}">افزودن به سبد</button>
-      </div>
-    </div>
-  `).join('');
-  grid.querySelectorAll('[data-add]').forEach(b=>{
-    b.addEventListener('click',()=>{
-      cart[b.dataset.add]=(cart[b.dataset.add]||0)+1;
-      renderCart();
-    });
+
+
+  products.unshift({
+
+    id: Date.now(),
+
+    name,
+
+    price,
+
+    category,
+
+    image,
+
+    description:
+      description ||
+      "محصول جدید الف شاپ"
+
   });
+
+
+  save(KEY.products, products);
+
+  renderProducts();
+
+  renderAdmin();
+
+  toast(
+    "محصول اضافه شد 💗"
+  );
+
 }
 
-document.querySelectorAll('.chip').forEach(c=>{
-  c.addEventListener('click',()=>{
-    document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
-    c.classList.add('active');
-    activeCategory=c.dataset.cat;
-    renderProducts();
-  });
-});
-document.getElementById('sortSelect').addEventListener('change',renderProducts);
 
-function cartItemsArray(){
-  return Object.entries(cart).map(([id,qty])=>{
-    const p=siteData.products.find(x=>x.id===id);
-    return p?{id,name:p.name,price:p.price,qty,image:p.image}:null;
-  }).filter(Boolean);
-}
-function cartTotal(){
-  return cartItemsArray().reduce((s,i)=>s+i.price*i.qty,0);
-}
-function renderCart(){
-  const items=cartItemsArray();
-  document.getElementById('cartCount').textContent=items.reduce((s,i)=>s+i.qty,0);
-  const box=document.getElementById('cartItemsBox');
-  if(!items.length){
-    box.innerHTML='<div class="empty-state">🛒<h3>سبد خرید خالیه</h3><p>هنوز محصولی انتخاب نکردی.</p></div>';
-  }else{
-    box.innerHTML=items.map(i=>`
-      <div class="cart-item">
-        <div style="width:52px;height:64px;border-radius:8px;overflow:hidden;background:var(--panel-2);flex-shrink:0;">
-          ${i.image?`<img src="${escapeHtml(i.image)}" style="width:100%;height:100%;object-fit:cover;">`:''}
+function renderAdminProducts() {
+
+  document.getElementById(
+    "adminProducts"
+  ).innerHTML =
+
+    products.map(product => `
+
+      <div class="admin-product">
+
+        <div class="admin-product-info">
+
+          <b>
+            ${product.name}
+          </b>
+
+          <small>
+            ${money(product.price)}
+          </small>
+
         </div>
-        <div style="flex:1;">
-          <div style="font-size:13.5px;font-weight:700;">${escapeHtml(i.name)}</div>
-          <div class="mono" style="font-size:12.5px;color:var(--text-dim);">${money(i.price)}</div>
-        </div>
-        <div class="qty-ctrl">
-          <button data-dec="${i.id}">−</button>
-          <span class="mono">${i.qty}</span>
-          <button data-inc="${i.id}">+</button>
-        </div>
+
+        <button
+          class="delete"
+          onclick="deleteProduct(${product.id})"
+        >
+          🗑️
+        </button>
+
       </div>
-    `).join('');
-    box.querySelectorAll('[data-inc]').forEach(b=>b.addEventListener('click',()=>{ cart[b.dataset.inc]++; renderCart(); }));
-    box.querySelectorAll('[data-dec]').forEach(b=>b.addEventListener('click',()=>{
-      cart[b.dataset.dec]--; if(cart[b.dataset.dec]<=0) delete cart[b.dataset.dec];
-      renderCart();
-    }));
-  }
-  document.getElementById('cartTotal').textContent=money(cartTotal());
-  document.getElementById('paymentBox').style.display='none';
+
+    `).join("");
+
 }
 
-document.getElementById('cartBtn').addEventListener('click',()=>document.getElementById('cartOverlay').classList.add('show'));
-document.getElementById('closeCart').addEventListener('click',()=>document.getElementById('cartOverlay').classList.remove('show'));
 
-document.getElementById('checkoutBtn').addEventListener('click',async()=>{
-  const toast=document.getElementById('checkoutToast');
-  toast.classList.add('show');
-  const items=cartItemsArray();
-  if(!items.length){ toast.className='toast err show'; toast.textContent='سبد خریدت خالیه.'; return; }
-  if(!currentUser){
-    toast.className='toast err show'; toast.textContent='اول باید وارد حسابت بشی.';
-    document.getElementById('accountOverlay').classList.add('show');
-    return;
-  }
-  const total=cartTotal();
-  const order={id:uid(),items,total,phone:currentUser.phone,name:currentUser.name,status:'pending',ts:Date.now()};
-  siteData.pendingOrders.push(order);
-  await saveData();
-  cart={};
-  renderCart();
-  toast.className='toast ok show'; toast.textContent='سفارش ثبت شد و برای بررسی مدیریت ارسال شد.';
+function deleteProduct(id) {
 
-  const payBox=document.getElementById('paymentBox');
-  if(siteData.gatewayLink){
-    const url=siteData.gatewayLink+(siteData.gatewayLink.includes('?')?'&':'?')+'amount='+Math.round(total);
-    payBox.innerHTML=`<div class="card" style="margin-top:0;">
-      <div style="font-size:13.5px;color:var(--text-dim);">مبلغ قابل پرداخت</div>
-      <div class="mono" style="font-size:20px;color:var(--berry);margin:6px 0 14px;">${money(total)}</div>
-      <a href="${url}" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;justify-content:center;">پرداخت از طریق درگاه</a>
-    </div>`;
-    payBox.style.display='block';
-  }
-});
+  products =
+    products.filter(
+      x => x.id !== id
+    );
 
-/* ---------- account ---------- */
-document.getElementById('accountBtn').addEventListener('click',()=>document.getElementById('accountOverlay').classList.add('show'));
-document.getElementById('closeAccount').addEventListener('click',()=>document.getElementById('accountOverlay').classList.remove('show'));
-document.querySelectorAll('[data-atab]').forEach(t=>{
-  t.addEventListener('click',()=>{
-    document.querySelectorAll('[data-atab]').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('#loggedOutView .tab-view').forEach(v=>v.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById(t.dataset.atab).classList.add('active');
+  save(KEY.products, products);
+
+  renderProducts();
+
+  renderAdmin();
+
+  toast(
+    "محصول حذف شد."
+  );
+
+}
+
+
+/* دکمه‌ها */
+
+document
+  .getElementById("cartButton")
+  .onclick = () => {
+
+    openModal("cartModal");
+
+    renderCart();
+
+  };
+
+
+document
+  .getElementById("accountButton")
+  .onclick = () => {
+
+    openModal("accountModal");
+
+    if (session) {
+
+      showProfile();
+
+    } else {
+
+      document
+        .getElementById("profileBox")
+        .classList.add("hidden");
+
+      document
+        .getElementById("loginBox")
+        .classList.remove("hidden");
+
+    }
+
+  };
+
+
+document
+  .getElementById("loginButton")
+  .onclick = login;
+
+
+document
+  .getElementById("registerButton")
+  .onclick = register;
+
+
+document
+  .getElementById("showRegister")
+  .onclick = () => {
+
+    document
+      .getElementById("loginBox")
+      .classList.add("hidden");
+
+    document
+      .getElementById("registerBox")
+      .classList.remove("hidden");
+
+  };
+
+
+document
+  .getElementById("showLogin")
+  .onclick = () => {
+
+    document
+      .getElementById("registerBox")
+      .classList.add("hidden");
+
+    document
+      .getElementById("loginBox")
+      .classList.remove("hidden");
+
+  };
+
+
+document
+  .getElementById("logoutButton")
+  .onclick = () => {
+
+    session = null;
+
+    localStorage.removeItem(
+      KEY.session
+    );
+
+    closeModal("accountModal");
+
+    toast(
+      "از حساب خارج شدی."
+    );
+
+  };
+
+
+document
+  .getElementById("checkoutButton")
+  .onclick = checkout;
+
+
+document
+  .getElementById("adminButton")
+  .onclick = () => {
+
+    openModal("adminModal");
+
+  };
+
+
+document
+  .getElementById("adminLoginButton")
+  .onclick = adminLogin;
+
+
+document
+  .getElementById("saveGateway")
+  .onclick = () => {
+
+    gateway =
+      document
+        .getElementById(
+          "gatewayInput"
+        )
+        .value
+        .trim();
+
+
+    localStorage.setItem(
+      KEY.gateway,
+      gateway
+    );
+
+
+    toast(
+      "لینک درگاه ذخیره شد 💳"
+    );
+
+  };
+
+
+document
+  .getElementById("addProduct")
+  .onclick = addProduct;
+
+
+document
+  .getElementById("searchInput")
+  .oninput =
+    renderProducts;
+
+
+document
+  .querySelectorAll(
+    ".categories button"
+  )
+  .forEach(button => {
+
+    button.onclick = () => {
+
+      document
+        .querySelectorAll(
+          ".categories button"
+        )
+        .forEach(x =>
+          x.classList.remove("active")
+        );
+
+
+      button.classList.add("active");
+
+      renderProducts();
+
+    };
+
   });
-});
-function updateAccountUI(){
-  const label=document.getElementById('accountLabel');
-  const loggedOut=document.getElementById('loggedOutView');
-  const loggedIn=document.getElementById('loggedInView');
-  if(currentUser){
-    label.textContent=currentUser.name||currentUser.phone;
-    loggedOut.style.display='none';
-    loggedIn.style.display='block';
-    document.getElementById('accountNameSpan').textContent=currentUser.name||currentUser.phone;
-  }else{
-    label.textContent='ورود';
-    loggedOut.style.display='block';
-    loggedIn.style.display='none';
-  }
-}
-document.getElementById('signupBtn').addEventListener('click',async()=>{
-  const phone=document.getElementById('signupPhone').value.trim();
-  const name=document.getElementById('signupName').value.trim();
-  const pass=document.getElementById('signupPass').value;
-  const toast=document.getElementById('signupToast');
-  toast.classList.add('show');
-  if(!phone||!name||!pass){ toast.className='toast err show'; toast.textContent='همه‌ی فیلدها رو پر کن.'; return; }
-  if(users.find(u=>u.phone===phone)){ toast.className='toast err show'; toast.textContent='این شماره قبلاً ثبت‌نام کرده.'; return; }
-  const newUser={phone,name,password:pass,ts:Date.now()};
-  users.push(newUser);
-  await saveUsers();
-  currentUser=newUser;
-  localStorage.setItem('alefShopPhone',phone);
-  toast.className='toast ok show'; toast.textContent='ثبت‌نام موفق بود!';
-  updateAccountUI();
-  setTimeout(()=>document.getElementById('accountOverlay').classList.remove('show'),700);
-});
-document.getElementById('loginBtn').addEventListener('click',async()=>{
-  const phone=document.getElementById('loginPhone').value.trim();
-  const pass=document.getElementById('loginPass').value;
-  const toast=document.getElementById('loginToast');
-  toast.classList.add('show');
-  const u=users.find(x=>x.phone===phone && x.password===pass);
-  if(!u){ toast.className='toast err show'; toast.textContent='شماره یا رمز اشتباهه.'; return; }
-  currentUser=u;
-  localStorage.setItem('alefShopPhone',phone);
-  toast.className='toast ok show'; toast.textContent='خوش اومدی!';
-  updateAccountUI();
-  setTimeout(()=>document.getElementById('accountOverlay').classList.remove('show'),700);
-});
-document.getElementById('logoutBtn').addEventListener('click',()=>{
-  currentUser=null;
-  localStorage.removeItem('alefShopPhone');
-  updateAccountUI();
-});
 
-/* ---------- admin ---------- */
-document.getElementById('openAdmin').addEventListener('click',()=>document.getElementById('adminOverlay').classList.add('show'));
-document.getElementById('closeAdmin').addEventListener('click',()=>document.getElementById('adminOverlay').classList.remove('show'));
-document.getElementById('adminLoginBtn').addEventListener('click',()=>{
-  if(document.getElementById('adminPass').value===ADMIN_PASSWORD){
-    document.getElementById('adminLoginView').style.display='none';
-    document.getElementById('adminPanelView').style.display='block';
-  }else{
-    document.getElementById('adminLoginError').classList.add('show');
-  }
-});
-document.querySelectorAll('#adminPanelView .tab-btn').forEach(t=>{
-  t.addEventListener('click',()=>{
-    document.querySelectorAll('#adminPanelView .tab-btn').forEach(x=>x.classList.remove('active'));
-    document.querySelectorAll('#adminPanelView .tab-view').forEach(v=>v.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById(t.dataset.tab).classList.add('active');
-  });
-});
 
-document.getElementById('addProductBtn').addEventListener('click',async()=>{
-  const name=document.getElementById('pName').value.trim();
-  const price=parseFloat(document.getElementById('pPrice').value);
-  const category=document.getElementById('pCat').value;
-  const image=document.getElementById('pImg').value.trim();
-  const desc=document.getElementById('pDesc').value.trim();
-  if(!name||!price) return;
-  siteData.products.push({id:uid(),name,price,category,image,desc,ts:Date.now()});
-  await saveData();
-  ['pName','pPrice','pImg','pDesc'].forEach(id=>document.getElementById(id).value='');
-  render();
-});
-function renderAdminProducts(){
-  const box=document.getElementById('adminProductsList');
-  if(!siteData.products.length){ box.innerHTML='<p style="color:var(--text-dim);font-size:14px;">محصولی ثبت نشده.</p>'; return; }
-  const sorted=[...siteData.products].sort((a,b)=>b.ts-a.ts);
-  box.innerHTML=sorted.map(p=>`
-    <div class="row-item">
-      <div><b>${escapeHtml(p.name)}</b> <span class="mono" style="color:var(--text-dim);">${money(p.price)}</span> · ${escapeHtml(p.category)}</div>
-      <button class="del-btn" data-del-p="${p.id}">حذف</button>
-    </div>
-  `).join('');
-  box.querySelectorAll('[data-del-p]').forEach(b=>b.addEventListener('click',async()=>{
-    siteData.products=siteData.products.filter(x=>x.id!==b.dataset.delP);
-    await saveData(); render();
-  }));
-}
-function renderAdminPending(){
-  const box=document.getElementById('pendingOrdersList');
-  if(!siteData.pendingOrders.length){ box.innerHTML='<p style="color:var(--text-dim);font-size:14px;">سفارشی در انتظار نیست.</p>'; return; }
-  const sorted=[...siteData.pendingOrders].sort((a,b)=>b.ts-a.ts);
-  box.innerHTML=sorted.map(o=>`
-    <div class="row-item">
-      <div>
-        <div><b>${escapeHtml(o.name)}</b> <span class="mono" style="color:var(--text-dim);">${escapeHtml(o.phone)}</span></div>
-        <div style="font-size:12.5px;color:var(--text-dim);">${o.items.map(i=>escapeHtml(i.name)+' ×'+i.qty).join('، ')}</div>
-        <div class="mono" style="color:var(--berry);margin-top:4px;">${money(o.total)}</div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="accept-btn" data-accept-o="${o.id}">قبول سفارش</button>
-        <button class="del-btn" data-del-o="${o.id}">رد</button>
-      </div>
-    </div>
-  `).join('');
-  box.querySelectorAll('[data-accept-o]').forEach(b=>b.addEventListener('click',async()=>{
-    const o=siteData.pendingOrders.find(x=>x.id===b.dataset.acceptO);
-    if(o){ o.status='confirmed'; siteData.confirmedOrders.push(o); siteData.pendingOrders=siteData.pendingOrders.filter(x=>x.id!==o.id); }
-    await saveData(); render();
-  }));
-  box.querySelectorAll('[data-del-o]').forEach(b=>b.addEventListener('click',async()=>{
-    siteData.pendingOrders=siteData.pendingOrders.filter(x=>x.id!==b.dataset.delO);
-    await saveData(); render();
-  }));
-}
-function renderAdminConfirmed(){
-  const box=document.getElementById('confirmedOrdersList');
-  if(!siteData.confirmedOrders.length){ box.innerHTML='<p style="color:var(--text-dim);font-size:14px;">هنوز سفارشی تأیید نشده.</p>'; return; }
-  const sorted=[...siteData.confirmedOrders].sort((a,b)=>b.ts-a.ts);
-  box.innerHTML=sorted.map(o=>`
-    <div class="row-item">
-      <div>
-        <div><b>${escapeHtml(o.name)}</b> <span class="mono" style="color:var(--text-dim);">${escapeHtml(o.phone)}</span></div>
-        <div style="font-size:12.5px;color:var(--text-dim);">${o.items.map(i=>escapeHtml(i.name)+' ×'+i.qty).join('، ')}</div>
-        <div class="mono" style="color:var(--berry);margin-top:4px;">${money(o.total)}</div>
-      </div>
-      <button class="del-btn" data-del-co="${o.id}">حذف</button>
-    </div>
-  `).join('');
-  box.querySelectorAll('[data-del-co]').forEach(b=>b.addEventListener('click',async()=>{
-    siteData.confirmedOrders=siteData.confirmedOrders.filter(x=>x.id!==b.dataset.delCo);
-    await saveData(); render();
-  }));
-}
-function renderGatewayInput(){
-  const el=document.getElementById('gatewayInput');
-  if(document.activeElement!==el) el.value=siteData.gatewayLink||'';
-}
-document.getElementById('saveGatewayBtn').addEventListener('click',async()=>{
-  siteData.gatewayLink=document.getElementById('gatewayInput').value.trim();
-  await saveData(); render();
-});
+/* شروع */
 
-loadUsers();
-loadData();
-}
+document
+  .querySelector(
+    '.categories button[data-category="همه"]'
+  )
+  .classList.add("active");
+
+
+renderProducts();
+
+renderCart();
